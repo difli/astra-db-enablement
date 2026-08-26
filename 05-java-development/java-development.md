@@ -22,12 +22,14 @@ Source: [Get started with the Data API](https://docs.datastax.com/en/astra-db-se
 ```java
 String endpoint = System.getenv("API_ENDPOINT");
 String token = System.getenv("APPLICATION_TOKEN");
+String keyspace =
+    System.getenv().getOrDefault("KEYSPACE_NAME", "default_keyspace");
 
 DataAPIClient client = new DataAPIClient(token);
-Database database = client.getDatabase(endpoint);
+Database database = client.getDatabase(endpoint, keyspace);
 ```
 
-That is the whole connection story for Lab 2. No contact points, no SCB unzip, no `cassandra.yaml`.
+That matches `Connect.java`. No contact points, no SCB unzip, no `cassandra.yaml`. Pass the keyspace so Lab 2 hits the same container as Lab 1.
 
 Never hard-code tokens. Never commit `.env` files.
 
@@ -37,7 +39,7 @@ The project in [`sample-app/sample-app.md`](../sample-app/sample-app.md) is the 
 
 | Class | Shows |
 |---|---|
-| `Connect` | Client + database from environment variables |
+| `Connect` | Client + database from endpoint, token, and keyspace |
 | `IdentityApp` | Table insert and find by partition key (Enterprise Identity) |
 | `KnowledgeSearchApp` | Collection insert and ANN search with a metadata filter |
 | `WorkshopApp` | Runs identity then Knowledge Search |
@@ -55,17 +57,21 @@ Operations you must be able to point to in the code:
 You can use the Data API against tables you created in **Lab 1 with CQL**. That is deliberate: CQL and the Data API share the same table.
 
 ```java
+UUID userId = UUID.fromString("11111111-1111-1111-1111-111111111111");
 Table<Row> users = database.getTable("users_by_id");
 
 users.insertOne(
     new Row()
-        .addText("user_id", userId)
+        .add("user_id", userId)
         .addText("email", "alex@example.com")
         .addText("display_name", "Alex")
-        .addText("status", "active"));
+        .addText("status", "active")
+        .add("updated_at", Instant.now()));
 
 Optional<Row> found = users.findOne(Filters.eq("user_id", userId));
 ```
+
+`user_id` is a CQL `uuid`. Use `.add(...)` with a `UUID`, not `.addText`. The sample app writes this table only; dual-write `users_by_email` in production (see Lab 2 Part A).
 
 The Data API always uses `LOCAL_QUORUM`. You do not set consistency in the client.
 
@@ -91,7 +97,7 @@ Source: [Java driver](https://docs.datastax.com/en/astra-db-serverless/drivers/j
 
 - **Timeouts and retries with backoff** on rate limits (especially after hibernation or a traffic jump)
 - **Idempotent writes** (inbox primary key) rather than LWT on a hot partition
-- **Dual-write both identity tables** if you add `users_by_email`
+- **Dual-write `users_by_email`** when a profile changes (Lab 2 Part A writes `users_by_id` only)
 - **Warm** on-demand databases before a launch, or use PCUs in production
 
 ## Lab

@@ -6,7 +6,7 @@ This answers: *How do I get started immediately?*
 
 ## Create an Astra account
 
-1. Open the [Astra signup](https://www.datastax.com/products/datastax-astra) page and create an account, or sign in.
+1. Open the [Astra Portal](https://astra.datastax.com) and create an account, or sign in.
 2. Free plan is enough for this workshop.
 
 ## Create a Serverless (vector) database
@@ -26,10 +26,10 @@ From the database page, copy:
 | Value | Used for |
 |---|---|
 | **API endpoint** | Data API (Lab 2). Form: `https://DATABASE_ID-REGION.apps.astra.datastax.com` |
-| **Application token** | Data API and CQL console. Starts with `AstraCS:` |
+| **Application token** | Data API (Lab 2). Starts with `AstraCS:`. Not required for the portal CQL console. |
 | **Keyspace name** | Both labs |
 
-Generate the token from **Database details** / **Generate token**. Store it like a password. The portal shows it once.
+Generate the token from the **Overview** tab, **Database Details**, **Generate token**. Store it like a password. The portal shows it once.
 
 You do **not** need a Secure Connect Bundle for this workshop. The SCB is for Cassandra drivers and `cqlsh` outside the portal. Lab 2 uses the Data API client (`astra-db-java`), which authenticates with endpoint + token.
 
@@ -37,16 +37,18 @@ You do **not** need a Secure Connect Bundle for this workshop. The SCB is for Ca
 
 1. Open your database in the Astra Portal.
 2. Click **CQL console**.
-3. Wait for the `token@cqlsh>` prompt.
+3. Wait for the `token@cqlsh>` prompt (this session uses your portal login, not the application token).
 
-If the prompt appears, pre-work is done.
+If the prompt appears, pre-work for Lab 1 is done. Lab 2 also needs this repository cloned on your machine.
 
 ## Set environment variables for Lab 2
+
+The Java apps read **process environment variables** in the same terminal where you run Maven. A `.env` file is not loaded automatically.
 
 On macOS / Linux:
 
 ```bash
-export API_ENDPOINT="https://YOUR_DB_ID-YOUR_REGION.apps.astra.datastax.com"
+export API_ENDPOINT="https://DATABASE_ID-REGION.apps.astra.datastax.com"
 export APPLICATION_TOKEN="AstraCS:..."
 export KEYSPACE_NAME="default_keyspace"
 ```
@@ -54,7 +56,7 @@ export KEYSPACE_NAME="default_keyspace"
 On Windows PowerShell:
 
 ```powershell
-$env:API_ENDPOINT="https://YOUR_DB_ID-YOUR_REGION.apps.astra.datastax.com"
+$env:API_ENDPOINT="https://DATABASE_ID-REGION.apps.astra.datastax.com"
 $env:APPLICATION_TOKEN="AstraCS:..."
 $env:KEYSPACE_NAME="default_keyspace"
 ```

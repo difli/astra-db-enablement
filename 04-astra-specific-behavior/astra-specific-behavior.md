@@ -13,7 +13,7 @@ If you pass unsupported DDL properties, **the statement still runs**. Astra DB *
 The optional table properties Astra applies are `default_time_to_live` and `comment`. **`compaction` and `gc_grace_seconds` are ignored.** So are caching, compression, `nodesync`, and most other Cassandra `WITH` clauses.
 
 ```sql
-CREATE TABLE IF NOT EXISTS demo.ignored_props (
+CREATE TABLE IF NOT EXISTS ignored_props (
   id uuid PRIMARY KEY
 ) WITH compaction = {'class': 'LeveledCompactionStrategy'}
   AND gc_grace_seconds = 86400;
@@ -38,7 +38,7 @@ Keyspaces are created in the **Astra Portal** or the **DevOps API**. UDTs are su
 
 ## Consistency, lists, and `cassandra.yaml`
 
-- Replication per region is platform-controlled. See [replicas and consistency](https://docs.datastax.com/en/astra-db-serverless/databases/database-limits.html).
+- Replication per region is platform-controlled. See [replicas and consistency](https://docs.datastax.com/en/astra-db-serverless/databases/database-limits.html#replicas-and-consistency).
 - Data API reads and writes use **`LOCAL_QUORUM`**.
 - CQL writes: all levels **except** `ONE`, `ANY`, `LOCAL_ONE`.
 - You cannot `UPDATE`/`DELETE` a list **by index** (no read-before-write list ops).
@@ -56,12 +56,12 @@ Idle on-demand databases can feel cold on a sudden spike. Warm them before a lau
 
 Types (fixed for the life of the group): **Small**, **Medium**, **General purpose** (default), **Cache optimized**. Prefer **Cache optimized** for vector working sets. Specs, tenant types (shared vs dedicated), and billing (RCU/HCU) are in [Provisioned Capacity Units](https://docs.datastax.com/en/astra-db-serverless/administration/provisioned-capacity-units.html).
 
-### Vector search: single PCU, not multi-region today
+### Vector search: one PCU; plan queries as single-region
 
 From [Plan PCU groups](https://docs.datastax.com/en/astra-db-serverless/administration/plan-pcu.html):
 
 1. A Serverless **(vector)** PCU group is **exactly one unit**. No autoscaling. No burst.
-2. **Do not design Knowledge Search as multi-region vector HA today.** Non-vector tables can use multi-region replication (one PCU group per region). Vector search is **single-region and single-PCU** until the platform says otherwise.
+2. You can add extra regions so **data** replicates, but **do not design Knowledge Search as multi-region vector-query HA today.** Each vector region still has a one-PCU ceiling. Treat vector search as **single-region** unless current [plan PCU](https://docs.datastax.com/en/astra-db-serverless/administration/plan-pcu.html) and [multi-region](https://docs.datastax.com/en/astra-db-serverless/databases/manage-regions.html) docs say otherwise.
 3. Vector and non-vector databases **cannot share** a PCU group.
 
 ## Adoption mistakes this module exists to prevent

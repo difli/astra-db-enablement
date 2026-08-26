@@ -7,7 +7,7 @@ Internal delivery notes for a ~2 hour Astra DB enablement session. Do not print 
 - Astra DB first. Not Cassandra operations.
 - Data modelling is the largest technical block. Protect it if you run long.
 - Two labs only: CQL, then Data API.
-- The [decision tree](01-why-astra-db/why-astra-db.md) is module 01. [Reference architectures](reference-architectures/reference-architectures.md) is take-home, not a seventh module.
+- The [decision tree](01-why-astra-db/why-astra-db.md) is module 01. [Reference architectures](reference-architectures/reference-architectures.md) and [ARCHITECTURE-REVIEW-CHECKLIST.md](ARCHITECTURE-REVIEW-CHECKLIST.md) are take-home, not a seventh module.
 - Limitations before production habits form. Module 04 is behavioural (ignored `WITH`, vector = 1 PCU), not a quota spreadsheet.
 - Customer-neutral. No customer names.
 
@@ -23,7 +23,7 @@ Use this as a facilitator sheet. Do not stamp these minutes on learner pages.
 | 0:35 | 30 min | [03 Data modelling](03-data-modeling/data-modeling.md) + Lab 1 part A |
 | 1:05 | 15 min | [04 Astra-specific behaviour](04-astra-specific-behavior/astra-specific-behavior.md) + Lab 1 part B |
 | 1:20 | 20 min | [05 Java development](05-java-development/java-development.md) + Lab 2 part A |
-| 1:40 | 10 min | [06 Knowledge Search](06-data-api-and-vector-search/data-api-and-vector-search.md) + Lab 2 part B |
+| 1:40 | 10 min | [06 Data API and vector search](06-data-api-and-vector-search/data-api-and-vector-search.md) + Lab 2 part B |
 | 1:50 | 10 min | Buffer / tree recap / Q&A |
 
 Hands-on is roughly half the session.
@@ -48,6 +48,7 @@ Confirm each person has:
 - An API endpoint
 - An application token
 - The CQL console opening in the Astra Portal
+- This repository cloned locally (Lab 2)
 
 Free-plan databases can hibernate. If a database is asleep, wake it before Lab 1. Current free-plan rules: [database limits](https://docs.datastax.com/en/astra-db-serverless/databases/database-limits.html).
 
@@ -58,8 +59,7 @@ Free-plan databases can hibernate. If a database is asleep, wake it before Lab 1
 - Replication is not yours to change. Cite [database limits](https://docs.datastax.com/en/astra-db-serverless/databases/database-limits.html), do not recite a quota table.
 - Vector search is **ANN**, not exact KNN.
 - PCU **types**: Small, Medium, General purpose, Cache optimized. Cache optimized for vector. Specs live in the [PCU docs](https://docs.datastax.com/en/astra-db-serverless/administration/provisioned-capacity-units.html).
-- **Serverless (vector) PCU groups are exactly one unit.** No autoscaling. No burst.
-- **Knowledge Search is not multi-region today.** Do not let a Cassandra-shaped multi-region design walk into the vector use case.
+- **Serverless (vector) PCU groups are exactly one unit.** No autoscaling. No burst. Extra regions can replicate Knowledge Search documents; they do not add vector-query capacity.
 
 ## Lab facilitation
 

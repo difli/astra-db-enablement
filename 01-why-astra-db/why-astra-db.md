@@ -8,7 +8,7 @@ This module answers:
 4. When should I **not** use it?
 5. How is it different from self-managed Cassandra?
 
-The decision tree below is the discussion. After the workshop, use the [reference architectures](../reference-architectures/reference-architectures.md) one-pager.
+The decision tree below is the discussion. After the workshop, use the [reference architectures](../reference-architectures/reference-architectures.md) one-pager and the [architecture review checklist](../ARCHITECTURE-REVIEW-CHECKLIST.md).
 
 ## What is Astra DB?
 
@@ -31,23 +31,23 @@ Source: [About Astra DB Serverless](https://docs.datastax.com/en/astra-db-server
 
 ```mermaid
 flowchart TD
-  start[Should I use Astra DB?] --> known{Can I list the access patterns?}
-  known -->|No| rdb[(Relational / warehouse)]
-  known -->|Yes| part{Can each hot query hit one partition?}
-  part -->|No| redesign[Redesign keys or pick another store]
-  part -->|Yes| ops{Need to set RF, compaction, cassandra.yaml, UDFs, or MVs?}
-  ops -->|Yes| cass[(Self-managed Cassandra)]
-  ops -->|No| analytic{Ad-hoc SQL, joins, or analytics?}
+  start["Should I use Astra DB?"] --> known{"Can I list the access patterns?"}
+  known -->|No| rdb["Relational / warehouse"]
+  known -->|Yes| part{"Can each hot query hit one partition?"}
+  part -->|No| redesign["Redesign keys or pick another store"]
+  part -->|Yes| ops{"Need to set RF, compaction, cassandra.yaml, UDFs, or MVs?"}
+  ops -->|Yes| cass["Self-managed Cassandra"]
+  ops -->|No| analytic{"Ad-hoc SQL, joins, or analytics?"}
   analytic -->|Yes| rdb
-  analytic -->|No| cl{Need write CL ONE / ANY / LOCAL_ONE?}
-  cl -->|Yes| notcql[Not Astra CQL]
-  cl -->|No| knn{Need exact nearest neighbour?}
-  knn -->|Yes| notvec[Astra vector is ANN only]
-  knn -->|No| mr{Need multi-region vector search today?}
-  mr -->|Yes| notmr[Not a current Astra pattern]
-  mr -->|No| yes[Use Astra DB]
-  yes --> tables[Tables: Identity, Event Inbox]
-  yes --> ks[Vector: Knowledge Search, single-region]
+  analytic -->|No| cl{"Need write CL ONE, ANY, or LOCAL_ONE?"}
+  cl -->|Yes| notcql["Not Astra CQL"]
+  cl -->|No| knn{"Need exact nearest neighbour?"}
+  knn -->|Yes| notvec["Astra vector is ANN only"]
+  knn -->|No| mr{"Need multi-region vector search today?"}
+  mr -->|Yes| notmr["Not vector-query HA today"]
+  mr -->|No| useAstra["Use Astra DB"]
+  useAstra --> tables["Tables: Identity, Event Inbox"]
+  useAstra --> ks["Vector: Knowledge Search, single-region queries"]
 ```
 
 Use Astra DB when you want Cassandra’s access pattern — **known partition, predictable latency, high write throughput** — without operating a cluster.
@@ -56,7 +56,7 @@ Use Astra DB when you want Cassandra’s access pattern — **known partition, p
 |---|---|
 | Known keys, operational reads/writes | Unknown queries, joins, warehouses |
 | Identity, inbox, similar lookup/ingest patterns | Cluster tuning, UDFs, materialized views |
-| Knowledge Search (ANN + metadata, single-region) | Exact KNN or multi-region vector search today |
+| Knowledge Search (ANN + metadata; plan query capacity as single-region) | Exact KNN, or treating extra regions as vector-query HA |
 
 Sources for the “no” leaves: [CQL for Astra DB](https://docs.datastax.com/en/astra-db-serverless/cql/develop-with-cql.html), [database limits](https://docs.datastax.com/en/astra-db-serverless/databases/database-limits.html), [vector search](https://docs.datastax.com/en/astra-db-serverless/databases/vector-search.html).
 
@@ -64,17 +64,17 @@ Sources for the “no” leaves: [CQL for Astra DB](https://docs.datastax.com/en
 
 ```mermaid
 flowchart LR
-  subgraph you [You own]
-    model[Data model]
-    app[Application]
-    tokens[Tokens and access]
-    queries[Query patterns]
+  subgraph you["You own"]
+    model["Data model"]
+    app["Application"]
+    tokens["Tokens and access"]
+    queries["Query patterns"]
   end
-  subgraph astra [Astra owns]
-    nodes[Nodes and AZs]
-    repl[Replication and repair]
-    compact[Compaction]
-    yaml[cassandra.yaml]
+  subgraph astra["Astra owns"]
+    nodes["Nodes and AZs"]
+    repl["Replication and repair"]
+    compact["Compaction"]
+    yaml["cassandra.yaml"]
   end
   app --> model
   app --> queries

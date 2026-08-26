@@ -19,7 +19,7 @@ After this workshop you can answer:
 9. What are the most common adoption mistakes?
 10. How do I get started immediately?
 
-The [decision tree](01-why-astra-db/why-astra-db.md) is how you answer 2–5 in the room. [Reference architectures](reference-architectures/reference-architectures.md) is the take-home one-pager.
+The [decision tree](01-why-astra-db/why-astra-db.md) is how you answer 2–5 in the room. Take-home (not on the clock): [reference architectures](reference-architectures/reference-architectures.md) and the [architecture review checklist](ARCHITECTURE-REVIEW-CHECKLIST.md).
 
 ## Who this is for
 
@@ -46,7 +46,7 @@ Suggested delivery time is in [FACILITATOR.md](FACILITATOR.md). Module pages do 
 
 ## Use cases
 
-Three customer-neutral patterns. Sketches: [reference architectures](reference-architectures/reference-architectures.md).
+Three customer-neutral patterns. Sketches: [reference architectures](reference-architectures/reference-architectures.md). Review questions: [architecture review checklist](ARCHITECTURE-REVIEW-CHECKLIST.md).
 
 | Pattern | Used to teach |
 |---|---|
@@ -60,6 +60,7 @@ No customer names. No industry lock-in.
 
 - An Astra account (free plan is enough for the labs)
 - A **Serverless (vector)** database
+- This repository cloned locally (required for Lab 2)
 - Java 17 or later (21 recommended)
 - Apache Maven 3.9 or later
 - A browser

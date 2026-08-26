@@ -14,7 +14,7 @@ import com.datastax.astra.client.databases.Database;
  * Lab 2 part B: Knowledge Search with ANN and a metadata filter.
  *
  * <p>Vectors are synthetic 5-d embeddings so the lab runs in any Serverless
- * (vector) region without vectorize.
+ * (vector) region without vectorize. {@code deleteAll} makes re-runs safe.
  */
 public final class KnowledgeSearchApp {
 
@@ -35,18 +35,41 @@ public final class KnowledgeSearchApp {
       knowledge = database.getCollection(COLLECTION);
     }
 
-    knowledge.insertOne(article("k1", "identity",
-        "Password reset requires the active session id from sessions_by_id",
-        new float[] {0.12f, 0.88f, 0.05f, 0.10f, 0.40f}));
-    knowledge.insertOne(article("k2", "identity",
-        "Look up a user by email through users_by_email, not ALLOW FILTERING",
-        new float[] {0.10f, 0.85f, 0.08f, 0.12f, 0.38f}));
-    knowledge.insertOne(article("k3", "inbox",
-        "Inbox events are idempotent when event_id is in the primary key",
-        new float[] {0.70f, 0.10f, 0.15f, 0.60f, 0.05f}));
-    knowledge.insertOne(article("k4", "platform",
-        "Vector search is ANN and should be planned as single-region and single-PCU today",
-        new float[] {0.20f, 0.25f, 0.80f, 0.15f, 0.10f}));
+    knowledge.deleteAll();
+
+    knowledge.insertOne(
+        article(
+            "k1",
+            "identity",
+            "Reset a work password from the identity portal. We email a "
+                + "one-time link to the address on your employee profile. Other "
+                + "signed-in sessions stay open until they expire, unless you "
+                + "choose Sign out everywhere.",
+            new float[] {0.12f, 0.88f, 0.05f, 0.10f, 0.40f}));
+    knowledge.insertOne(
+        article(
+            "k2",
+            "identity",
+            "Find an employee by work email in the company directory. Search "
+                + "is keyed by email. Do not download the full employee list to "
+                + "look up one person.",
+            new float[] {0.10f, 0.85f, 0.08f, 0.12f, 0.38f}));
+    knowledge.insertOne(
+        article(
+            "k3",
+            "finance",
+            "Invoice webhooks can arrive more than once. Use the event id to "
+                + "ignore duplicates. Process invoice.paid only the first time "
+                + "you see that id.",
+            new float[] {0.70f, 0.10f, 0.15f, 0.60f, 0.05f}));
+    knowledge.insertOne(
+        article(
+            "k4",
+            "platform",
+            "Help-center semantic search runs in a single region. Extra "
+                + "database regions can replicate documents; they do not add "
+                + "another vector-search capacity unit.",
+            new float[] {0.20f, 0.25f, 0.80f, 0.15f, 0.10f}));
 
     System.out.println("Inserted Knowledge Search documents into '" + COLLECTION + "'");
 

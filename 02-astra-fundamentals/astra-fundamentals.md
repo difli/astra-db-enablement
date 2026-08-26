@@ -6,11 +6,11 @@ Vocabulary for every later lab. After this module you can name the objects you w
 
 ```mermaid
 flowchart TB
-  org[Organization]
-  db[Database — Serverless vector or non-vector]
-  ks[Keyspace]
-  table[Table — fixed schema, rows]
-  coll[Collection — dynamic schema, documents]
+  org["Organization"]
+  db["Database: Serverless vector or non-vector"]
+  ks["Keyspace"]
+  table["Table: fixed schema, rows"]
+  coll["Collection: dynamic schema, documents"]
   org --> db
   db --> ks
   ks --> table
@@ -30,7 +30,7 @@ Sources: [About Astra DB Serverless](https://docs.datastax.com/en/astra-db-serve
 
 ### Tables vs collections — pick on purpose
 
-| | Tables | Collections |
+| Aspect | Tables | Collections |
 |---|---|---|
 | Schema | Fixed at create time | Dynamic per document |
 | Access | Partition key + clustering (CQL or Data API) | Filters, sort, vector sort |
@@ -45,9 +45,9 @@ Each Astra DB Serverless database starts in **one primary region**. Inside that 
 
 Writes are **eventually consistent** across replicas (and across regions, if you add regions). The Data API always uses **`LOCAL_QUORUM`**. CQL supports additional consistency levels except write `ONE`, `ANY`, and `LOCAL_ONE`.
 
-Adding regions is a paid capability. **Vector search should be planned as single-region today** — module 04.
+Adding regions is a paid capability. Extra regions **replicate data**. Plan vector **query** capacity as single-region today — each vector PCU group is one unit (module 04).
 
-Source: [Database limits — replicas and consistency](https://docs.datastax.com/en/astra-db-serverless/databases/database-limits.html).
+Source: [Database limits](https://docs.datastax.com/en/astra-db-serverless/databases/database-limits.html#replicas-and-consistency).
 
 ## How you connect
 
@@ -58,7 +58,7 @@ Source: [Database limits — replicas and consistency](https://docs.datastax.com
 | **CQL console** | Portal session | **Lab 1** |
 | **Cassandra drivers** | Secure Connect Bundle + token as password | Mentioned, not built |
 
-Application tokens look like `AstraCS:…`. They are not bound to a specific driver. A Database Administrator token on one database is enough for the labs.
+Application tokens look like `AstraCS:...`. They are not bound to a specific driver. A Database Administrator token on one database is enough for the labs.
 
 Sources: [Get started with the Data API](https://docs.datastax.com/en/astra-db-serverless/api-reference/dataapiclient.html), [Connection methods](https://docs.datastax.com/en/astra-db-serverless/databases/connection-methods-comparison.html).
 

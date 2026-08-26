@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS sessions_by_id (
   created_at timestamp,
   last_seen timestamp
 ) WITH default_time_to_live = 86400
-   AND comment = 'Identity sessions; TTL is applied';
+   AND comment = 'Identity sessions; TTL is one of the table properties Astra actually applies';
 
 CREATE TABLE IF NOT EXISTS users_by_email (
   email text PRIMARY KEY,

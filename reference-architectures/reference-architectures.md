@@ -1,6 +1,6 @@
 # Reference architectures
 
-Take-home one-pager. Not a timed workshop module. Use it after [the decision tree](../01-why-astra-db/why-astra-db.md).
+Take-home one-pager. Not a timed workshop module. Use it after [the decision tree](../01-why-astra-db/why-astra-db.md). After a design review, use the [architecture review checklist](../ARCHITECTURE-REVIEW-CHECKLIST.md).
 
 Three customer-neutral patterns. No extra labs.
 
@@ -18,11 +18,20 @@ Three customer-neutral patterns. No extra labs.
 
 **Shape:** four tables, one per query. Dual-write `users_by_id` and `users_by_email`. TTL on sessions.
 
-```text
-users_by_id          PRIMARY KEY (user_id)
-users_by_email       PRIMARY KEY (email)
-entitlements_by_user PRIMARY KEY (user_id, entitlement)
-sessions_by_id       PRIMARY KEY (session_id)  + default_time_to_live
+```mermaid
+flowchart LR
+  q1["Get profile"] --> byId["users_by_id"]
+  q4["Get user by email"] --> byEmail["users_by_email"]
+  q2["Get entitlements"] --> ent["entitlements_by_user"]
+  q3["Get session"] --> sess["sessions_by_id plus TTL"]
+  byId -.->|dual-write| byEmail
+```
+
+```sql
+PRIMARY KEY (user_id)                          -- users_by_id
+PRIMARY KEY (email)                            -- users_by_email
+PRIMARY KEY (user_id, entitlement)             -- entitlements_by_user
+PRIMARY KEY (session_id)                       -- sessions_by_id; plus default_time_to_live
 ```
 
 **API:** CQL or Data API tables. Not a collection. Not a secondary-index “users” table.
@@ -37,11 +46,18 @@ sessions_by_id       PRIMARY KEY (session_id)  + default_time_to_live
 
 **Shape:** composite partition `(consumer_id, bucket)`, clustering `event_time, event_id`, table TTL.
 
-```text
-inbox_by_consumer
-  PRIMARY KEY ((consumer_id, bucket), event_time, event_id)
-  CLUSTERING ORDER BY (event_time DESC, event_id ASC)
-  + default_time_to_live
+```mermaid
+flowchart LR
+  write["Append or retry"] --> inbox["inbox_by_consumer"]
+  read["Recent in a time window"] --> inbox
+  inbox --> part["partition: consumer_id, bucket"]
+  inbox --> clust["cluster: event_time DESC, event_id"]
+```
+
+```sql
+PRIMARY KEY ((consumer_id, bucket), event_time, event_id)
+-- CLUSTERING ORDER BY (event_time DESC, event_id ASC)
+-- plus default_time_to_live
 ```
 
 **API:** CQL or Data API tables. High ingest, idempotent primary key.
@@ -56,11 +72,18 @@ inbox_by_consumer
 
 **Shape:** vector-enabled **collection**. Metadata fields for filters (`topic`, `source`). Same embedding model on write and query. ANN + metadata filter together.
 
+```mermaid
+flowchart LR
+  write["Document plus embedding"] --> coll["knowledge collection"]
+  query["Query embedding plus topic filter"] --> coll
+  coll --> ann["ANN neighbours"]
+```
+
 **API:** Data API (`astra-db-java` in this workshop). Tables can hold vectors too; collections are the faster teaching surface.
 
-**Constraints today:** single-region; Serverless (vector) PCU group is **one unit**; prefer Cache optimized. See [plan PCU groups](https://docs.datastax.com/en/astra-db-serverless/administration/plan-pcu.html) and [vector search](https://docs.datastax.com/en/astra-db-serverless/databases/vector-search.html).
+**Constraints today:** plan vector **queries** as single-region. Extra regions can replicate documents; they do not add another vector PCU. A Serverless (vector) PCU group is **one unit**. Prefer Cache optimized. See [plan PCU groups](https://docs.datastax.com/en/astra-db-serverless/administration/plan-pcu.html) and [vector search](https://docs.datastax.com/en/astra-db-serverless/databases/vector-search.html).
 
-**Avoid:** using Knowledge Search to fetch `user_id`; exact KNN; multi-region vector failover; embedding with two different models.
+**Avoid:** using Knowledge Search to fetch `user_id`; exact KNN; treating extra regions as vector-query failover; embedding with two different models.
 
 ---
 

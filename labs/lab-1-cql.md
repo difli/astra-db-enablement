@@ -1,8 +1,8 @@
 # Lab 1 — Develop with CQL
 
-**API:** CQL console in the Astra Portal  
-**Use cases:** Enterprise Identity, Event Inbox  
-**When:** Part A during module 03. Part B during module 04.
+- **API:** CQL console in the Astra Portal
+- **Use cases:** Enterprise Identity, Event Inbox
+- **When:** Part A during module 03. Part B during module 04.
 
 Open your Serverless (vector) database → **CQL console**. Select your keyspace (often `default_keyspace`).
 
@@ -10,7 +10,7 @@ Open your Serverless (vector) database → **CQL console**. Select your keyspace
 USE default_keyspace;
 ```
 
-If your keyspace name differs, use that name everywhere below.
+If your keyspace name differs, use that name everywhere below. If the console rejects a paste of several statements, run them one `CREATE TABLE` at a time.
 
 ---
 
@@ -48,7 +48,11 @@ CREATE TABLE IF NOT EXISTS users_by_email (
 );
 ```
 
-`DESCRIBE TABLE users_by_id;` — name the partition key. There is no clustering column. That is correct for Q1 (get profile by id).
+```sql
+DESCRIBE TABLE users_by_id;
+```
+
+Name the partition key. There is no clustering column. That is correct for Q1 (get profile by id).
 
 ### A2. Write and read one user
 
@@ -152,7 +156,11 @@ CREATE TABLE IF NOT EXISTS inbox_with_cassandra_habits (
 
 Read the **warning**. The table is created. Compaction, `gc_grace_seconds`, and caching were **not** applied.
 
-`DESCRIBE TABLE inbox_with_cassandra_habits;` — you will not see your LCS settings as an applied choice you control. UCS is the platform strategy.
+```sql
+DESCRIBE TABLE inbox_with_cassandra_habits;
+```
+
+You will not see your LCS settings as an applied choice you control. UCS is the platform strategy.
 
 ### B3. Keyspaces are not CQL
 
@@ -161,7 +169,7 @@ CREATE KEYSPACE IF NOT EXISTS workshop_ks
   WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};
 ```
 
-This **fails**. Create keyspaces in the Astra Portal or DevOps API. Replication factor is not yours to set (RF=3, `NetworkTopologyStrategy`).
+This **fails**. Create keyspaces in the Astra Portal or DevOps API. Replication is platform-controlled; see [replicas and consistency](https://docs.datastax.com/en/astra-db-serverless/databases/database-limits.html#replicas-and-consistency).
 
 **Part B deliverable:** Inbox is idempotent and bucketed; you have seen a warning for ignored table properties; you have seen `CREATE KEYSPACE` reject.
 
