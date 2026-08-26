@@ -1,0 +1,41 @@
+# Secrets and Astra connection files
+.env
+.env.*
+!.env.example
+!**/.env.example
+*.zip
+secure-connect-*/
+identity.jks
+trustStore.jks
+*.jks
+*.pem
+*.key
+*.crt
+
+# Java / Maven
+target/
+*.class
+*.jar
+*.war
+*.log
+hs_err_pid*
+replay_pid*
+
+# IDEs
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+.factorypath
+.vscode/
+*.code-workspace
+
+# OS / editors
+.DS_Store
+Thumbs.db
+*~
+*.swp
+
+# Internal tooling (not part of the workshop)
+.bob/
