@@ -55,7 +55,7 @@ Free-plan databases can hibernate. If a database is asleep, wake it before Lab 1
 ## Talking points that people get wrong
 
 - Astra **creates the table** even when it **ignores** `compaction`, `gc_grace_seconds`, and most other `WITH` properties. A warning is not a failure.
-- Data API reads and writes use `LOCAL_QUORUM`. CQL write consistency `ONE`, `ANY`, and `LOCAL_ONE` are not allowed.
+- Data API reads and writes use `LOCAL_QUORUM`. CQL reads support all consistency levels. CQL writes support all consistency levels except `ONE`, `ANY`, and `LOCAL_ONE`.
 - Replication is not yours to change. Cite [database limits](https://docs.datastax.com/en/astra-db-serverless/databases/database-limits.html), do not recite a quota table.
 - Vector search is **ANN**, not exact KNN.
 - PCU **types**: Small, Medium, General purpose, Cache optimized. Cache optimized for vector. Specs live in the [PCU docs](https://docs.datastax.com/en/astra-db-serverless/administration/provisioned-capacity-units.html).

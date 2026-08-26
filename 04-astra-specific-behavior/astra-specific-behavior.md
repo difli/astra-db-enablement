@@ -40,6 +40,7 @@ Keyspaces are created in the **Astra Portal** or the **DevOps API**. UDTs are su
 
 - Replication per region is platform-controlled. See [replicas and consistency](https://docs.datastax.com/en/astra-db-serverless/databases/database-limits.html#replicas-and-consistency).
 - Data API reads and writes use **`LOCAL_QUORUM`**.
+- CQL reads: all consistency levels.
 - CQL writes: all levels **except** `ONE`, `ANY`, `LOCAL_ONE`.
 - You cannot `UPDATE`/`DELETE` a list **by index** (no read-before-write list ops).
 - You cannot edit `cassandra.yaml`.

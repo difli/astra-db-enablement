@@ -40,7 +40,7 @@ flowchart TD
   ops -->|No| analytic{"Ad-hoc SQL, joins, or analytics?"}
   analytic -->|Yes| rdb
   analytic -->|No| cl{"Need write CL ONE, ANY, or LOCAL_ONE?"}
-  cl -->|Yes| notcql["Not Astra CQL"]
+  cl -->|Yes| notcql["Not allowed for Astra CQL writes"]
   cl -->|No| knn{"Need exact nearest neighbour?"}
   knn -->|Yes| notvec["Astra vector is ANN only"]
   knn -->|No| mr{"Need multi-region vector search today?"}
@@ -85,11 +85,11 @@ flowchart LR
 |---|---|---|
 | Nodes, gossip, snitches | You | Platform |
 | Replication | You choose | Fixed per region; not editable. See [database limits](https://docs.datastax.com/en/astra-db-serverless/databases/database-limits.html) |
-| Compaction | You tune | Platform-managed (UCS). Extra `WITH` clauses are [ignored](https://docs.datastax.com/en/astra-db-serverless/cql/develop-with-cql.html) |
+| Compaction | You tune | Platform-managed (UCS). Unsupported table properties (`compaction`, `gc_grace_seconds`, caching) are [ignored](https://docs.datastax.com/en/astra-db-serverless/cql/develop-with-cql.html) |
 | `CREATE KEYSPACE` in CQL | Yes | No — portal or DevOps API |
 | `nodetool` / JMX | Daily tools | Not available |
 | Write CL `ONE` / `ANY` / `LOCAL_ONE` | Allowed | Disallowed |
-| Data API | Not the product surface | Primary application API |
+| Data API | Not the product surface | Recommended for new application development in this workshop; CQL drivers remain fully supported |
 | Capacity | Cluster size | On-demand or [PCU groups](https://docs.datastax.com/en/astra-db-serverless/administration/provisioned-capacity-units.html) (module 04) |
 
 The storage engine is still Cassandra-shaped. **Your partitions, clustering, TTLs, and tombstones still matter.** What disappears is cluster administration.
