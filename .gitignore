@@ -39,3 +39,5 @@ Thumbs.db
 
 # Internal tooling (not part of the workshop)
 .bob/
+
+*.pdf
