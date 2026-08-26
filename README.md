@@ -19,7 +19,7 @@ After this workshop you can answer:
 9. What are the most common adoption mistakes?
 10. How do I get started immediately?
 
-The [decision tree](01-why-astra-db/why-astra-db.md) is how you answer 2–5 in the room. Take-home (not on the clock): [reference architectures](reference-architectures/reference-architectures.md) and the [architecture review checklist](ARCHITECTURE-REVIEW-CHECKLIST.md).
+The [decision tree](01-why-astra-db/why-astra-db.md) is how you answer 2–5 in the room. Take-home (not on the clock): [reference architectures](reference-architectures/reference-architectures.md), the [architecture review checklist](ARCHITECTURE-REVIEW-CHECKLIST.md), and the [Oracle to Astra DB assessment](ORACLE-TO-ASTRA-ASSESSMENT.md) (modernization opportunity discovery).
 
 ## Who this is for
 

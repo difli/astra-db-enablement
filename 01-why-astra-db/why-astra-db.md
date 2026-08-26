@@ -8,7 +8,7 @@ This module answers:
 4. When should I **not** use it?
 5. How is it different from self-managed Cassandra?
 
-The decision tree below is the discussion. After the workshop, use the [reference architectures](../reference-architectures/reference-architectures.md) one-pager and the [architecture review checklist](../ARCHITECTURE-REVIEW-CHECKLIST.md).
+The decision tree below is the discussion. After the workshop, use the [reference architectures](../reference-architectures/reference-architectures.md) one-pager, the [architecture review checklist](../ARCHITECTURE-REVIEW-CHECKLIST.md), and the [Oracle to Astra DB assessment](../ORACLE-TO-ASTRA-ASSESSMENT.md) for modernization opportunity discovery.
 
 ## What is Astra DB?
 
