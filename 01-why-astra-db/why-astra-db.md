@@ -31,34 +31,38 @@ Source: [About Astra DB Serverless](https://docs.datastax.com/en/astra-db-server
 
 ```mermaid
 flowchart TD
-  start["Should I use Astra DB?"] --> known{"Can I list the access patterns?"}
-  known -->|No| rdb["Relational / warehouse"]
-  known -->|Yes| part{"Can each hot query hit one partition?"}
-  part -->|No| redesign["Redesign keys or pick another store"]
-  part -->|Yes| ops{"Need to set RF, compaction, cassandra.yaml, UDFs, or MVs?"}
-  ops -->|Yes| cass["Self-managed Cassandra"]
-  ops -->|No| analytic{"Ad-hoc SQL, joins, or analytics?"}
-  analytic -->|Yes| rdb
-  analytic -->|No| cl{"Need write CL ONE, ANY, or LOCAL_ONE?"}
-  cl -->|Yes| notcql["Not allowed for Astra CQL writes"]
-  cl -->|No| knn{"Need exact nearest neighbour?"}
-  knn -->|Yes| notvec["Astra vector is ANN only"]
-  knn -->|No| mr{"Need multi-region vector search today?"}
-  mr -->|Yes| notmr["Not vector-query HA today"]
-  mr -->|No| useAstra["Use Astra DB"]
-  useAstra --> tables["Tables: Identity, Event Inbox"]
-  useAstra --> ks["Vector: Knowledge Search, single-region queries"]
+  start["Should I use Astra DB?"] --> work{"What is the workload?"}
+
+  work -->|Analytics / reporting / ad-hoc SQL| warehouse["Warehouse or relational store"]
+
+  work -->|Operational application data| ops{"Can you name the hot access patterns?"}
+  ops -->|Not yet| design["Define access patterns first"]
+  ops -->|Yes| tables["Astra tables"]
+  tables --> id["Identity platforms"]
+  tables --> profiles["Customer profiles"]
+  tables --> sessions["Session stores"]
+  tables --> ingest["Event ingestion"]
+  tables --> inbox["Event inbox"]
+  tables --> ts["Time-series workloads"]
+
+  work -->|Knowledge Search / AI| vec["Astra vector search"]
+  vec --> ks["Knowledge Search"]
+  vec --> semantic["Semantic Search"]
+  vec --> docs["Document Search"]
+
+  work -->|Operational plus AI| both["Serverless (vector): tables and collections in one database"]
+  both --> tables
+  both --> vec
 ```
 
 Use Astra DB when you want Cassandra’s access pattern — **known partition, predictable latency, high write throughput** — without operating a cluster.
 
-| Fit | Not a fit |
+| Strong fit | Consider another technology |
 |---|---|
-| Known keys, operational reads/writes | Unknown queries, joins, warehouses |
-| Identity, inbox, similar lookup/ingest patterns | Cluster tuning, UDFs, materialized views |
-| Knowledge Search (ANN + metadata; plan query capacity as single-region) | Exact KNN, or treating extra regions as vector-query HA |
+| Known keys: identity, profiles, sessions, inbox, ingest, time-series | Ad-hoc SQL, joins, warehouses |
+| Knowledge Search, semantic search, document search | |
 
-Sources for the “no” leaves: [CQL for Astra DB](https://docs.datastax.com/en/astra-db-serverless/cql/develop-with-cql.html), [database limits](https://docs.datastax.com/en/astra-db-serverless/databases/database-limits.html), [vector search](https://docs.datastax.com/en/astra-db-serverless/databases/vector-search.html).
+Platform caveats (consistency, partition design, ignored table properties, ANN vs KNN, vector capacity) are on the [architecture review checklist](../ARCHITECTURE-REVIEW-CHECKLIST.md).
 
 ## How is Astra DB different from self-managed Cassandra?
 
