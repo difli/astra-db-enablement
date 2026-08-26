@@ -50,7 +50,7 @@ flowchart LR
 - What does the application do?
 - Who uses it?
 - What are the critical transactions?
-- Which queries happen most often?
+- Which queries happen most often in production telemetry, not only in the schema documentation?
 - What are the latency-sensitive operations?
 
 You are looking for **operational** traffic: logins, profile reads, session create, event append, catalog get-by-id. You are not yet looking at tables or Oracle features.
@@ -97,6 +97,13 @@ If yes, this is a candidate. Platform caveats (consistency, ignored table proper
 - Is data migration straightforward once the **target** model exists?
 
 Moving rows is rarely the hard part. **Naming the queries and designing keys** is.
+
+Before committing to migration, agree on four proof points:
+
+- **Business correctness:** priority queries return equivalent business results.
+- **Performance:** representative workload tests meet the agreed latency and throughput objectives.
+- **Resilience:** retries, duplicate events, temporary failures, and recovery behave correctly.
+- **Economics:** expected Astra consumption and one-time modernisation effort support the business case.
 
 ---
 
@@ -167,7 +174,22 @@ The storage engine is still wide-row / partition oriented. **You** own the data 
 - **Application ownership increases.** Procedures, triggers, and FKs become code. That is expected, not a regression, if the payoff is latency and scale.
 - **Cassandra-style thinking is different from relational thinking.** Same business facts; different shape. Architects who skip this step recreate Oracle in CQL and then struggle.
 
+- **Choose migration tooling only after defining the target model.** Oracle-to-Astra is not a Cassandra rehosting exercise. Cassandra-family ZDM and SSTable migration tools do not automatically convert an Oracle schema, joins, or PL/SQL into an Astra model.
+
 Worked shapes for identity, inbox, and knowledge search: [reference architectures](reference-architectures/reference-architectures.md).
+
+#### What a feasible migration usually looks like
+
+A successful Oracle-to-Astra migration is normally an application-modernisation path, not a schema export/import:
+
+1. Identify one bounded operational workload.
+2. Design the Astra model from its priority queries.
+3. Prototype and validate correctness and performance.
+4. Backfill target-shaped data and keep changes synchronized where required.
+5. Compare Oracle and Astra results before progressively moving traffic.
+6. Keep a defined rollback path until Astra is accepted as authoritative.
+
+The exact synchronization approach can be batch, application dual-write, CDC, or a combination. Select it only after the target Astra model is defined.
 
 ---
 
