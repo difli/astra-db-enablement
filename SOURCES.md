@@ -52,7 +52,3 @@ Every technical claim in this workshop is grounded in Astra DB Serverless docume
 ## Modelling pedagogy adapted from
 
 Query-first design, partition keys, clustering, denormalisation, bucketing, wide/hot partitions, TTL, tombstones, and anti-patterns are adapted from [michelderu/cassandra-fundamentals](https://github.com/michelderu/cassandra-fundamentals) (data-modelling track only). Architecture, gossip, repairs, and Docker cluster labs are not used.
-
-## Explicitly not used
-
-Langflow, GraphQL / Stargate GraphQL, deprecated Document API, customer-specific material, and Cassandra cluster-operations documentation.
