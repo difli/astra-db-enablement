@@ -35,6 +35,8 @@ If those properties matter and the hot paths can be named, Astra DB is worth a s
 
 ## 2. The five-step assessment
 
+![Oracle to Astra DB assessment flow](assets/oracle-to-astradb.png)
+
 Work the steps in order. Stop when the answer is clearly “not this workload” — that is a successful assessment.
 
 ```mermaid

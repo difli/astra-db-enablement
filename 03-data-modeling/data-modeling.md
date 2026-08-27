@@ -45,6 +45,8 @@ Composite partition keys use extra parentheses: `((consumer_id, bucket), ...)`.
 
 ## Use case 1 — Enterprise Identity Platform
 
+![Identity Platform — query-driven data modelling: one table per access pattern](../assets/identity-platform.png)
+
 Access patterns (write these down **before** CQL):
 
 | # | Query | Known values |
@@ -70,6 +72,8 @@ Sessions are short-lived. Give the table a **TTL** (`default_time_to_live`) rath
 You will create these tables in the lab below.
 
 ## Use case 2 — Event Inbox Pattern
+
+![Event Inbox — partitioning, bucketing, and idempotency](../assets/event-inbox.png)
 
 Access patterns:
 
