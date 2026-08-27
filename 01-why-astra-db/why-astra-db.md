@@ -59,8 +59,10 @@ Use Astra DB when you want Cassandra’s access pattern — **known partition, p
 
 | Strong fit | Consider another technology |
 |---|---|
-| Known keys: identity, profiles, sessions, inbox, ingest, time-series | Ad-hoc SQL, joins, warehouses |
+| Known keys: identity, profiles, sessions, inbox, ingest, time-series | Ad-hoc SQL, warehouses |
 | Knowledge Search, semantic search, document search | |
+
+A few joins are not a reason to reject Astra. Implement them in the data model and application (extra query tables, denormalization, dual-write). Join-centric systems and ad-hoc SQL as the product belong on a relational store or warehouse.
 
 Platform caveats (consistency, partition design, ignored table properties, ANN vs KNN, vector capacity) are on the [architecture review checklist](../ARCHITECTURE-REVIEW-CHECKLIST.md).
 
