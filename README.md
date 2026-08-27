@@ -35,7 +35,7 @@ Solution architects, developers, data engineers, technical consultants, solution
 | [03 Data modelling](03-data-modeling/data-modeling.md) | Query-first design. Starts **Lab 1 (CQL)** |
 | [04 Astra-specific behaviour](04-astra-specific-behavior/astra-specific-behavior.md) | Ignored CQL, behavioural limits, slim PCU. Finishes **Lab 1** |
 | [05 Java development](05-java-development/java-development.md) | Connect, read, write, query. Starts **Lab 2 (Data API)** |
-| [06 Data API and vector search](06-data-api-and-vector-search/data-api-and-vector-search.md) | Knowledge Search: ANN + filters. Finishes **Lab 2** |
+| [06 Data API and vector search](06-data-api-and-vector-search/data-api-and-vector-search.md) | Knowledge Search: ANN + filters. Finishes **Lab 2**. Wrap-up. |
 
 There are **two labs**, one per primary API. Hands-on is on the module pages: CQL in [03](03-data-modeling/data-modeling.md)–[04](04-astra-specific-behavior/astra-specific-behavior.md), Java Data API in [05](05-java-development/java-development.md)–[06](06-data-api-and-vector-search/data-api-and-vector-search.md).
 

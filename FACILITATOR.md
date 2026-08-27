@@ -24,7 +24,7 @@ Use this as a facilitator sheet. Do not stamp these minutes on learner pages.
 | 1:05 | 15 min | [04 Astra-specific behaviour](04-astra-specific-behavior/astra-specific-behavior.md) + Lab 1 part B |
 | 1:20 | 20 min | [05 Java development](05-java-development/java-development.md) + Lab 2 part A |
 | 1:40 | 10 min | [06 Data API and vector search](06-data-api-and-vector-search/data-api-and-vector-search.md) + Lab 2 part B |
-| 1:50 | 10 min | Buffer / tree recap / Q&A |
+| 1:50 | 10 min | Wrap-up on module 06 / tree recap / Q&A |
 
 Hands-on is roughly half the session.
 

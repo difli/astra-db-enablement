@@ -137,17 +137,23 @@ ANN neighbours for topic=identity:
   {"_id":"k2","topic":"identity","text":"Find an employee by work email…"}
 ```
 
-## You are done when
+## Wrap-up
 
-You can explain, without slides:
+This is the end of the workshop. There is no seventh module. The 10-minute buffer in a live session is this page plus the [decision tree](../01-why-astra-db/why-astra-db.md).
 
-- Why identity is tables and Knowledge Search is a collection
-- Why ANN + metadata beats “embed everything and hope”
-- Why Astra ignored your `WITH compaction` in module 04
-- How the Java client authenticates
-- Why adding a region is not extra vector-query capacity
+You can now answer:
 
-Walk the [decision tree](../01-why-astra-db/why-astra-db.md) once more. Then keep [reference architectures](../reference-architectures/reference-architectures.md) and the [architecture review checklist](../ARCHITECTURE-REVIEW-CHECKLIST.md) for later.
+| Question | What to say |
+|---|---|
+| What is Astra DB? | Cassandra as a service. You own the model and the app; the platform owns nodes, compaction, and `cassandra.yaml`. |
+| Why / when / when not? | Walk the [decision tree](../01-why-astra-db/why-astra-db.md). Known partition keys and Knowledge Search fit. Ad-hoc SQL and warehouses do not. |
+| vs self-managed Cassandra? | Same data model (partitions, TTL, tombstones). No cluster admin. |
+| How do I model? | One table per query. Identity is four tables and a dual-write. Inbox is bucket + `event_id` + TTL. |
+| How do I connect Java? | Data API: endpoint + token + keyspace. No Secure Connect Bundle for this path. |
+| Which constraints matter? | Unsupported `WITH` is a **warning**. `CREATE KEYSPACE` is an **error**. Vector PCU is **one unit**. Numbers: [database limits](https://docs.datastax.com/en/astra-db-serverless/databases/database-limits.html). |
+| Common mistakes? | `ALLOW FILTERING` as the email lookup. Compaction in DDL. Extra regions as vector-query HA. |
+
+Take-home (not on the clock): [reference architectures](../reference-architectures/reference-architectures.md), the [architecture review checklist](../ARCHITECTURE-REVIEW-CHECKLIST.md), and the [Oracle to Astra DB assessment](../ORACLE-TO-ASTRA-ASSESSMENT.md).
 
 ## Optional next reading
 
