@@ -6,9 +6,9 @@ Three customer-neutral patterns. No extra labs.
 
 | Pattern | Taught in |
 |---|---|
-| Enterprise Identity Platform | Module 03, Lab 1A, Lab 2A |
-| Event Inbox Pattern | Module 03, Lab 1B |
-| Knowledge Search | Module 06, Lab 2B |
+| Enterprise Identity Platform | Modules 03 and 05 |
+| Event Inbox Pattern | Modules 03 and 04 |
+| Knowledge Search | Module 06 |
 
 ---
 

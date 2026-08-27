@@ -2,6 +2,8 @@
 
 One application. No Spring Boot. The goal is Astra DB, not a framework course.
 
+Read this page first (client vs driver, connect, tables and collections). You run the sample app at the end of the module.
+
 ## Which Java library?
 
 | Library | When |
@@ -29,7 +31,7 @@ DataAPIClient client = new DataAPIClient(token);
 Database database = client.getDatabase(endpoint, keyspace);
 ```
 
-No contact points, no SCB unzip, no `cassandra.yaml`. Pass the keyspace so Lab 2 hits the same container as Lab 1.
+No contact points, no SCB unzip, no `cassandra.yaml`. Pass the keyspace so this lab hits the same container as the CQL tables from module 03.
 
 Never hard-code tokens. Never commit `.env` files.
 
@@ -54,7 +56,7 @@ Operations you must be able to point to in the code:
 
 ## Tables through the Data API
 
-You can use the Data API against tables you created in **Lab 1 with CQL**. That is deliberate: CQL and the Data API share the same table. From [`IdentityApp.java`](../sample-app/src/main/java/com/datastax/enablement/IdentityApp.java):
+You can use the Data API against tables you created in **CQL in module 03**. That is deliberate: CQL and the Data API share the same table. From [`IdentityApp.java`](../sample-app/src/main/java/com/datastax/enablement/IdentityApp.java):
 
 ```java
 UUID userId = UUID.fromString("11111111-1111-1111-1111-111111111111");
@@ -71,11 +73,28 @@ users.insertOne(
 Optional<Row> found = users.findOne(Filters.eq("user_id", userId));
 ```
 
-`user_id` is a CQL `uuid`. Use `.add(...)` with a `UUID`, not `.addText`. The sample app writes this table only; dual-write `users_by_email` in production (see Lab 2 Part A).
+`user_id` is a CQL `uuid`. Use `.add(...)` with a `UUID`, not `.addText`. The sample app writes this table only; dual-write `users_by_email` in production (the lab below does not demonstrate that second write).
 
 The Data API always uses `LOCAL_QUORUM`. You do not set consistency in the client.
 
 Some CQL features are awkward or unsupported through the Data API (for example some frozen types, TTL as a write-time API concern). If you need those, use CQL. For identity CRUD, the Data API is enough.
+
+## Collections through the Data API
+
+Same client, same `Database`. A **collection** stores documents (dynamic fields), not CQL rows. You do **not** run this until [module 06](../06-data-api-and-vector-search/data-api-and-vector-search.md). From [`KnowledgeSearchApp.java`](../sample-app/src/main/java/com/datastax/enablement/KnowledgeSearchApp.java):
+
+```java
+Collection<Document> knowledge = database.getCollection("knowledge");
+
+knowledge.insertOne(
+    new Document()
+        .id("k1")
+        .append("topic", "identity")
+        .append("text", "Reset a work password from the identity portal.")
+        .vector(new float[] {0.12f, 0.88f, 0.05f, 0.10f, 0.40f}));
+```
+
+`getTable` vs `getCollection` is the fork: identity/inbox stay **tables**; Knowledge Search is a **collection**.
 
 ## Driver path (awareness only)
 
@@ -97,12 +116,45 @@ Source: [Java driver](https://docs.datastax.com/en/astra-db-serverless/drivers/j
 
 - **Timeouts and retries with backoff** on rate limits (especially after hibernation or a traffic jump)
 - **Idempotent writes** (inbox primary key) rather than LWT on a hot partition
-- **Dual-write `users_by_email`** when a profile changes (Lab 2 Part A writes `users_by_id` only)
+- **Dual-write `users_by_email`** when a profile changes (the lab below writes `users_by_id` only)
 - **Warm** on-demand databases before a launch, or use PCUs in production
 
-## Lab
+## Lab — Connect, write, read (`users_by_id`)
 
-**Now:** [Lab 2 — Develop with the Data API](../labs/lab-2-data-api.md) **Part A** — connect, write, and read `users_by_id` (see [`sample-app`](../sample-app/sample-app.md)).
+The code is above and in [`sample-app`](../sample-app/sample-app.md). You run it with Maven; you do not paste it into the CQL console.
+
+Prerequisites: `users_by_id` from [module 03](../03-data-modeling/data-modeling.md); Java 17+ and Maven 3.9+; environment variables from [00 Get started](../00-get-started/get-started.md) in **this** terminal (quick `source .env`, or the explicit `export` / PowerShell commands).
+
+`test -f pom.xml || cd sample-app` means: if you are not already in the folder that contains `pom.xml`, enter `sample-app`.
+
+```bash
+test -f pom.xml || cd sample-app
+mvn -q compile
+mvn -q exec:java -Dexec.mainClass="com.datastax.enablement.IdentityApp"
+```
+
+Expected (SLF4J “No SLF4J providers” lines are noise, not a failure):
+
+```text
+Connected to https://…apps.astra.datastax.com keyspace=default_keyspace
+Wrote users_by_id partition 11111111-1111-1111-1111-111111111111
+Read profile: {"user_id":"11111111-…","email":"alex@example.com","display_name":"Alex",…}
+```
+
+If it fails:
+
+| Symptom | Check |
+|---|---|
+| `API_ENDPOINT` / `APPLICATION_TOKEN` must be defined | Load vars in **this** terminal (module 00: `source .env` or explicit `export` / PowerShell). Java does not read `.env` |
+| 401 / unauthorized | Token copied fully, `AstraCS:` prefix, no extra quotes or spaces |
+| table not found | Module 03 identity tables; keyspace name; CQL names are case-sensitive if created in the portal |
+| `findOne` empty | Same keyspace as module 03; `user_id` matches the uuid you inserted |
+| timeout / hibernated | Open the database in the portal until **Active** |
+| Unsupported class version / compiler release | Java 17+ (`java -version`) |
+
+This app writes `users_by_id` only. Module 03 dual-wrote `users_by_email` in CQL. A production identity service must write both tables on every profile change; this lab does not demonstrate that second write.
+
+**Deliverable:** You have a Java process that authenticates to Astra DB and performs a partition-key read.
 
 ## Next
 

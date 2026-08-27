@@ -1,6 +1,6 @@
 # Facilitator guide
 
-Internal delivery notes for a ~2 hour Astra DB enablement session. Do not print this as participant slides. Learners should use the module pages and labs.
+Internal delivery notes for a ~2 hour Astra DB enablement session. Do not print this as participant slides. Learners should use the module pages.
 
 ## Stance
 
@@ -72,8 +72,6 @@ Free-plan databases can hibernate. If a database is asleep, wake it before Lab 1
 
 - Part A: connect, insert, find on `users_by_id`
 - Part B: `knowledge` collection + vector find with a metadata filter
-
-Worked answers live in [solutions/](solutions/).
 
 ## Room setup
 

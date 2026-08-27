@@ -2,7 +2,7 @@
 
 This is the most important technical module. Astra DB will not save a relational schema.
 
-After this module you start **[Lab 1 — Develop with CQL](../labs/lab-1-cql.md)** (part A: identity).
+At the end of this page you create the identity tables in the CQL console.
 
 ## Golden rule
 
@@ -67,7 +67,7 @@ Q4 is denormalisation: `users_by_email` stores `user_id` so “login by email”
 
 Sessions are short-lived. Give the table a **TTL** (`default_time_to_live`) rather than relying on a nightly delete job. Deletes and expired TTLs both create **tombstones** — see below.
 
-You will create these tables in Lab 1 part A.
+You will create these tables in the lab below.
 
 ## Use case 2 — Event Inbox Pattern
 
@@ -90,7 +90,7 @@ Design choices:
 PRIMARY KEY ((consumer_id, bucket), event_time, event_id)
 ```
 
-You will create this in Lab 1 part B (module 04), together with Astra DDL surprises.
+You will create this in [module 04](../04-astra-specific-behavior/astra-specific-behavior.md), together with Astra DDL surprises.
 
 ## Partition health
 
@@ -155,11 +155,106 @@ Before you ship a table:
 
 Knowledge Search is a **collection**, not a CQL primary key. It is taught in [module 06](../06-data-api-and-vector-search/data-api-and-vector-search.md).
 
-## Lab
+## Lab — Enterprise Identity (CQL console)
 
-Do these in order:
+Open your Serverless (vector) database → **CQL console**. Select your keyspace (often `default_keyspace`).
 
-**Now:** [Lab 1 — Develop with CQL](../labs/lab-1-cql.md) **Part A (Identity)** — create the identity tables, insert, select by partition key.
+```sql
+USE default_keyspace;
+```
+
+If your keyspace name differs, use that name everywhere below. If the console rejects a paste of several statements, run them one `CREATE TABLE` at a time.
+
+### A1. Create query-first tables
+
+```sql
+CREATE TABLE IF NOT EXISTS users_by_id (
+  user_id uuid PRIMARY KEY,
+  email text,
+  display_name text,
+  status text,
+  updated_at timestamp
+);
+
+CREATE TABLE IF NOT EXISTS entitlements_by_user (
+  user_id uuid,
+  entitlement text,
+  granted_at timestamp,
+  PRIMARY KEY (user_id, entitlement)
+);
+
+CREATE TABLE IF NOT EXISTS sessions_by_id (
+  session_id uuid PRIMARY KEY,
+  user_id uuid,
+  created_at timestamp,
+  last_seen timestamp
+) WITH default_time_to_live = 86400
+   AND comment = 'Identity sessions; TTL is one of the table properties Astra actually applies';
+
+CREATE TABLE IF NOT EXISTS users_by_email (
+  email text PRIMARY KEY,
+  user_id uuid
+);
+```
+
+```sql
+DESCRIBE TABLE users_by_id;
+```
+
+Expected: each `CREATE TABLE` succeeds (or reports the table already exists). `DESCRIBE` shows `PRIMARY KEY (user_id)` and **no** clustering column. That is correct for Q1 (get profile by id).
+
+### A2. Write and read one user
+
+```sql
+INSERT INTO users_by_id (user_id, email, display_name, status, updated_at)
+VALUES (11111111-1111-1111-1111-111111111111, 'alex@example.com', 'Alex', 'active', toTimestamp(now()));
+
+INSERT INTO users_by_email (email, user_id)
+VALUES ('alex@example.com', 11111111-1111-1111-1111-111111111111);
+
+INSERT INTO entitlements_by_user (user_id, entitlement, granted_at)
+VALUES (11111111-1111-1111-1111-111111111111, 'invoice.read', toTimestamp(now()));
+
+INSERT INTO entitlements_by_user (user_id, entitlement, granted_at)
+VALUES (11111111-1111-1111-1111-111111111111, 'invoice.write', toTimestamp(now()));
+
+INSERT INTO sessions_by_id (session_id, user_id, created_at, last_seen)
+VALUES (22222222-2222-2222-2222-222222222222, 11111111-1111-1111-1111-111111111111, toTimestamp(now()), toTimestamp(now()));
+```
+
+Queries — each is a **single partition**:
+
+```sql
+SELECT * FROM users_by_id WHERE user_id = 11111111-1111-1111-1111-111111111111;
+
+SELECT * FROM users_by_email WHERE email = 'alex@example.com';
+
+SELECT * FROM entitlements_by_user WHERE user_id = 11111111-1111-1111-1111-111111111111;
+
+SELECT * FROM sessions_by_id WHERE session_id = 22222222-2222-2222-2222-222222222222;
+```
+
+Expected: inserts report no rows. The four `SELECT`s return **one** profile (Alex), **one** email mapping, **two** entitlements (`invoice.read` and `invoice.write`), and **one** session.
+
+### A3. Feel the anti-pattern (do not ship this)
+
+```sql
+SELECT * FROM users_by_id WHERE email = 'alex@example.com';
+```
+
+This fails without `ALLOW FILTERING` because `email` is not the partition key.
+
+Expected: an error that the query might involve data filtering (not a row).
+
+Now try:
+
+```sql
+SELECT * FROM users_by_id WHERE email = 'alex@example.com' ALLOW FILTERING;
+```
+
+Expected: Alex’s row on this tiny table. `ALLOW FILTERING` lets CQL scan and match a **non-key** column (here `email`). That scan hits every partition you read; it will not stay fast as the table grows. It is **not** a production path. The production path is `users_by_email`.
+
+**Deliverable:** You can explain why identity is four tables, not one.
 
 ## Next
 

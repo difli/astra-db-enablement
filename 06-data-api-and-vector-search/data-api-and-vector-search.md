@@ -1,6 +1,6 @@
 # 06 — Data API and vector search
 
-A correct mental model, not a RAG course. This finishes **[Lab 2](../labs/lab-2-data-api.md)** (part B: Knowledge Search).
+A correct mental model, not a RAG course. At the end of this page you run Knowledge Search in Java.
 
 Sources: [Vector search](https://docs.datastax.com/en/astra-db-serverless/databases/vector-search.html), [Vector concepts](https://docs.datastax.com/en/astra-db-serverless/get-started/vector-concepts.html), [Data API](https://docs.datastax.com/en/astra-db-serverless/api-reference/dataapiclient.html).
 
@@ -68,7 +68,7 @@ CollectionFindOptions options =
 knowledge.find(filter, options);
 ```
 
-`createCollection` fails if `knowledge` already exists. The sample app catches that and calls `getCollection`, then `deleteAll` so Lab 2 Part B can be re-run without `DOCUMENT_ALREADY_EXISTS`. It inserts four help-center articles; the full texts live in [`datasets/knowledge-notes.json`](../datasets/knowledge-notes.json).
+`createCollection` fails if `knowledge` already exists. The sample app catches that and calls `getCollection`, then `deleteAll` so this lab can be re-run without `DOCUMENT_ALREADY_EXISTS`. It inserts four help-center articles (`k1`–`k4`).
 
 You can also put vectors on **tables**. Collections are the faster teaching surface for document-shaped search.
 
@@ -81,9 +81,61 @@ From [module 04](../04-astra-specific-behavior/astra-specific-behavior.md) and [
 - Prefer **Cache optimized** for vector working sets.
 - Collection index rules are in [database limits](https://docs.datastax.com/en/astra-db-serverless/databases/database-limits.html); selective indexing is set at **create** time.
 
-## Lab
+## Lab — Knowledge Search (collection + ANN)
 
-Complete **[Lab 2 Part B](../labs/lab-2-data-api.md)**.
+The code is above and in [`KnowledgeSearchApp.java`](../sample-app/src/main/java/com/datastax/enablement/KnowledgeSearchApp.java). Same Maven project and environment variables as [module 05](../05-java-development/java-development.md).
+
+```bash
+test -f pom.xml || cd sample-app
+mvn -q exec:java -Dexec.mainClass="com.datastax.enablement.KnowledgeSearchApp"
+```
+
+Expected (SLF4J noise is harmless):
+
+```text
+Connected to https://…apps.astra.datastax.com keyspace=default_keyspace
+Inserted Knowledge Search documents into 'knowledge'
+ANN neighbours for topic=identity:
+  {"_id":"k1","topic":"identity","text":"Reset a work password…"}
+  {"_id":"k2","topic":"identity","text":"Find an employee by work email…"}
+```
+
+Four documents were inserted (`k1`–`k4`). Only **k1** and **k2** have `topic=identity`, so the filter drops finance/platform. `limit(3)` is a ceiling; two rows is correct. k1 first is expected (the query vector is closest to k1).
+
+If it fails:
+
+| Symptom | Check |
+|---|---|
+| Collection create / index limit | Database already has too many collections — [database limits](https://docs.datastax.com/en/astra-db-serverless/databases/database-limits.html). Drop an unused collection, or reuse `knowledge` |
+| Neighbours from the wrong topic | The metadata filter was omitted. ANN without a filter is a grab bag |
+
+**Deliverable:** You can explain why the filter is there (vector search is similarity, not an ID lookup) and why extra regions do not give Knowledge Search extra vector-query capacity (module 04).
+
+### Run both halves
+
+[`WorkshopApp.java`](../sample-app/src/main/java/com/datastax/enablement/WorkshopApp.java) calls module 05 then this lab:
+
+```java
+IdentityApp.upsertAndRead(database);
+KnowledgeSearchApp.search(database);
+```
+
+```bash
+test -f pom.xml || cd sample-app
+mvn -q exec:java -Dexec.mainClass="com.datastax.enablement.WorkshopApp"
+```
+
+Expected (SLF4J noise is harmless):
+
+```text
+Connected to https://…apps.astra.datastax.com keyspace=default_keyspace
+Wrote users_by_id partition 11111111-1111-1111-1111-111111111111
+Read profile: {"user_id":"11111111-…","email":"alex@example.com","display_name":"Alex",…}
+Inserted Knowledge Search documents into 'knowledge'
+ANN neighbours for topic=identity:
+  {"_id":"k1","topic":"identity","text":"Reset a work password…"}
+  {"_id":"k2","topic":"identity","text":"Find an employee by work email…"}
+```
 
 ## You are done when
 
@@ -91,7 +143,7 @@ You can explain, without slides:
 
 - Why identity is tables and Knowledge Search is a collection
 - Why ANN + metadata beats “embed everything and hope”
-- Why Astra ignored your `WITH compaction` in Lab 1
+- Why Astra ignored your `WITH compaction` in module 04
 - How the Java client authenticates
 - Why adding a region is not extra vector-query capacity
 

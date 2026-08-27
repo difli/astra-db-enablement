@@ -7,8 +7,8 @@ One Maven project. Data API only (`astra-db-java`). No Spring Boot.
 | Class | Lab |
 |---|---|
 | `Connect` | Endpoint + token + keyspace |
-| `IdentityApp` | Lab 2 part A — table write/read |
-| `KnowledgeSearchApp` | Lab 2 part B — collection vector search |
+| `IdentityApp` | Module 05 — table write/read |
+| `KnowledgeSearchApp` | Module 06 — collection vector search |
 | `WorkshopApp` | Both |
 
 ## Run
@@ -23,4 +23,4 @@ mvn -q exec:java -Dexec.mainClass="com.datastax.enablement.IdentityApp"
 mvn -q exec:java -Dexec.mainClass="com.datastax.enablement.KnowledgeSearchApp"
 ```
 
-Create `users_by_id` in [Lab 1](../labs/lab-1-cql.md) before `IdentityApp`.
+Create `users_by_id` in [module 03](../03-data-modeling/data-modeling.md) before `IdentityApp`.
