@@ -6,8 +6,8 @@ One application. No Spring Boot. The goal is Astra DB, not a framework course.
 
 | Library | When |
 |---|---|
-| **`astra-db-java`** (Data API client) | **This workshop.** Endpoint + token. Tables and collections. Vector search. |
-| Cassandra Java driver | CQL over mTLS using a **Secure Connect Bundle**. Username is the literal string `token`, password is the application token. |
+| **[`astra-db-java`](https://docs.datastax.com/en/astra-db-serverless/api-reference/dataapiclient.html)** (Data API client) | **This workshop.** Endpoint + token. Tables and collections. Vector search. |
+| [Cassandra Java driver](https://docs.datastax.com/en/astra-db-serverless/drivers/java-driver.html) | CQL over mTLS using a **Secure Connect Bundle**. Username is the literal string `token`, password is the application token. |
 
 Use the Data API client unless you are maintaining an existing CQL driver codebase.
 
@@ -16,6 +16,8 @@ Requirements: **Java 17+** (21 recommended), Maven 3.9+.
 Source: [Get started with the Data API](https://docs.datastax.com/en/astra-db-serverless/api-reference/dataapiclient.html).
 
 ## Authenticate
+
+From [`Connect.java`](../sample-app/src/main/java/com/datastax/enablement/Connect.java):
 
 ```java
 String endpoint = System.getenv("API_ENDPOINT");
@@ -27,7 +29,7 @@ DataAPIClient client = new DataAPIClient(token);
 Database database = client.getDatabase(endpoint, keyspace);
 ```
 
-That matches `Connect.java`. No contact points, no SCB unzip, no `cassandra.yaml`. Pass the keyspace so Lab 2 hits the same container as Lab 1.
+No contact points, no SCB unzip, no `cassandra.yaml`. Pass the keyspace so Lab 2 hits the same container as Lab 1.
 
 Never hard-code tokens. Never commit `.env` files.
 
@@ -37,10 +39,10 @@ The project in [`sample-app/sample-app.md`](../sample-app/sample-app.md) is the 
 
 | Class | Shows |
 |---|---|
-| `Connect` | Client + database from endpoint, token, and keyspace |
-| `IdentityApp` | Table insert and find by partition key (Enterprise Identity) |
-| `KnowledgeSearchApp` | Collection insert and ANN search with a metadata filter |
-| `WorkshopApp` | Runs identity then Knowledge Search |
+| [`Connect`](../sample-app/src/main/java/com/datastax/enablement/Connect.java) | Client + database from endpoint, token, and keyspace |
+| [`IdentityApp`](../sample-app/src/main/java/com/datastax/enablement/IdentityApp.java) | Table insert and find by partition key (Enterprise Identity) |
+| [`KnowledgeSearchApp`](../sample-app/src/main/java/com/datastax/enablement/KnowledgeSearchApp.java) | Collection insert and ANN search with a metadata filter |
+| [`WorkshopApp`](../sample-app/src/main/java/com/datastax/enablement/WorkshopApp.java) | Runs identity then Knowledge Search |
 
 Operations you must be able to point to in the code:
 
@@ -52,7 +54,7 @@ Operations you must be able to point to in the code:
 
 ## Tables through the Data API
 
-You can use the Data API against tables you created in **Lab 1 with CQL**. That is deliberate: CQL and the Data API share the same table.
+You can use the Data API against tables you created in **Lab 1 with CQL**. That is deliberate: CQL and the Data API share the same table. From [`IdentityApp.java`](../sample-app/src/main/java/com/datastax/enablement/IdentityApp.java):
 
 ```java
 UUID userId = UUID.fromString("11111111-1111-1111-1111-111111111111");
@@ -77,7 +79,7 @@ Some CQL features are awkward or unsupported through the Data API (for example s
 
 ## Driver path (awareness only)
 
-If you connect with the Cassandra Java driver:
+If you connect with the Cassandra Java driver (not in this sample app — see the [Java driver docs](https://docs.datastax.com/en/astra-db-serverless/drivers/java-driver.html)):
 
 ```java
 CqlSession session = CqlSession.builder()
