@@ -8,13 +8,7 @@
 
 - Lab 1 Part A tables exist (`users_by_id` at minimum)
 - Java 17+ and Maven 3.9+
-- Environment variables from [00 Get started](../00-get-started/get-started.md) in **this** terminal (PowerShell equivalents are in 00):
-
-```bash
-export API_ENDPOINT="https://DATABASE_ID-REGION.apps.astra.datastax.com"
-export APPLICATION_TOKEN="AstraCS:..."
-export KEYSPACE_NAME="default_keyspace"
-```
+- Environment variables from [00 Get started](../00-get-started/get-started.md) in **this** terminal (quick `source .env`, or the explicit `export` / PowerShell commands)
 
 ---
 
@@ -32,7 +26,7 @@ If it fails:
 
 | Symptom | Check |
 |---|---|
-| `API_ENDPOINT` / `APPLICATION_TOKEN` must be defined | Exports in **this** terminal (a `.env` file is not loaded) |
+| `API_ENDPOINT` / `APPLICATION_TOKEN` must be defined | Load vars in **this** terminal (module 00: `source .env` or explicit `export` / PowerShell). Java does not read `.env` |
 | 401 / unauthorized | Token copied fully, `AstraCS:` prefix, no extra quotes or spaces |
 | table not found | Lab 1 Part A; keyspace name; CQL names are case-sensitive if created in the portal |
 | timeout / hibernated | Open the database in the portal until **Active** |

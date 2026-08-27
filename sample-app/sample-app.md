@@ -13,13 +13,10 @@ One Maven project. Data API only (`astra-db-java`). No Spring Boot.
 
 ## Run
 
-Java 17+ and Maven 3.9+. The apps read **process environment variables**. Copying `.env.example` to `.env` does not load them; export the values in this terminal (see [00 Get started](../00-get-started/get-started.md)). The block below works from the repository root or from `sample-app`.
+Java 17+ and Maven 3.9+. The apps read **process environment variables**. Load them in this terminal first (quick `set -a && source .env && set +a` from the repository root, or the explicit commands in [00 Get started](../00-get-started/get-started.md)), then:
 
 ```bash
 test -f pom.xml || cd sample-app
-export API_ENDPOINT="https://DATABASE_ID-REGION.apps.astra.datastax.com"
-export APPLICATION_TOKEN="AstraCS:..."
-export KEYSPACE_NAME="default_keyspace"
 
 mvn -q compile
 mvn -q exec:java -Dexec.mainClass="com.datastax.enablement.IdentityApp"

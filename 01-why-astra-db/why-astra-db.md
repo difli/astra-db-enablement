@@ -12,9 +12,9 @@ The decision tree below is the discussion. After the workshop, use the [referenc
 
 ## What is Astra DB?
 
-**Astra DB Serverless** is a multi-cloud database-as-a-service built on Apache Cassandra. It is optimized for operational workloads that need large data volume, low latency, and flexible data models — including vector search.
+**Astra DB Serverless** is a multi-cloud database-as-a-service built on Apache Cassandra. It is optimized for operational workloads that need large data volume, low latency, and flexible data models — including vector search. You get a production-ready database from the start: no cluster to build, and no Cassandra operational settings to tune. On-demand capacity **autoscales** with usage.
 
-You do not provision nodes, pick a snitch, schedule repairs, or choose a compaction strategy. The service scales with usage. You spend time on the data model and the application.
+You do not provision nodes, pick a snitch, schedule repairs, or choose a compaction strategy. You spend time on the data model and the application.
 
 There are two deployment types:
 

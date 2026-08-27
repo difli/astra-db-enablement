@@ -13,9 +13,9 @@ This answers: *How do I get started immediately?*
 
 1. In the Astra Portal, create a database.
 2. Choose **Serverless (vector)**. You need vector support for Lab 2.
-3. Pick a cloud region close to you. Availability of vector databases varies by region — see [database regions](https://docs.datastax.com/en/astra-db-serverless/databases/regions.html).
-4. Keep the default keyspace name unless you have a reason to change it. Note the keyspace name. New Serverless (vector) databases typically start with `default_keyspace`.
-5. Wait until the database status is **Active**.
+3. Pick a cloud and region. On the **free plan**, **Serverless (vector)** is available only on **Amazon Web Services** in **`us-east-2`**. Paid orgs can use other vector regions — see [database regions](https://docs.datastax.com/en/astra-db-serverless/databases/regions.html).
+4. Wait until the database goes from **Pending** to **Active**.
+5. Keep the default keyspace name unless you have a reason to change it. Note the keyspace name. New Serverless (vector) databases typically start with `default_keyspace`.
 
 You cannot create a keyspace with CQL on Astra DB. Keyspaces are created in the portal or with the DevOps API. That is an Astra-specific fact you will see again in module 04.
 
@@ -25,13 +25,15 @@ From the database page, copy:
 
 | Value | Used for |
 |---|---|
-| **API endpoint** | Data API (Lab 2). Form: `https://DATABASE_ID-REGION.apps.astra.datastax.com` |
-| **Application token** | Data API (Lab 2). Starts with `AstraCS:`. Not required for the portal CQL console. |
-| **Keyspace name** | Both labs |
+| **API endpoint** | Lab 2 (Java Data API). Form: `https://DATABASE_ID-REGION.apps.astra.datastax.com` |
+| **Application token** | Lab 2 (Java Data API). Starts with `AstraCS:`. Not required for the portal CQL console (Lab 1). |
+| **Keyspace name** | Both labs (CQL and Java) |
 
 Generate the token from the **Overview** tab, **Database Details**, **Generate token**. Store it like a password. The portal shows it once.
 
-You do **not** need a Secure Connect Bundle for this workshop. The SCB is for Cassandra drivers and `cqlsh` outside the portal. Lab 2 uses the Data API client (`astra-db-java`), which authenticates with endpoint + token.
+Clone this repository if you have not already. In the repository root, copy `.env.example` to `.env` and fill in `API_ENDPOINT`, `APPLICATION_TOKEN`, and `KEYSPACE_NAME`. `.env` is gitignored. Then load those values into the Maven terminal (Java does not read `.env` by itself).
+
+You do **not** need a Secure Connect Bundle for this workshop. The SCB is for the Cassandra Java driver and `cqlsh` outside the portal. Lab 2 is the Java lab: it uses the Data API client (`astra-db-java`) with endpoint + token.
 
 ## Confirm the CQL console
 
@@ -43,9 +45,17 @@ If the prompt appears, pre-work for Lab 1 is done. Lab 2 also needs this reposit
 
 ## Set environment variables for Lab 2
 
-The Java apps read **process environment variables** in the same terminal where you run Maven. A `.env` file is not loaded automatically.
+The Java apps read **process environment variables** in the **same terminal** where you run Maven. Pick one path. You can `cd` into `sample-app` afterwards; the variables stay in that terminal.
 
-On macOS / Linux:
+**Quick path** (bash, zsh, or Git Bash on Windows), from the repository root after `.env` is filled:
+
+```bash
+set -a && source .env && set +a
+```
+
+**Explicit path** if you prefer not to `source .env`, or you are in Windows PowerShell.
+
+On macOS / Linux / Git Bash:
 
 ```bash
 export API_ENDPOINT="https://DATABASE_ID-REGION.apps.astra.datastax.com"
