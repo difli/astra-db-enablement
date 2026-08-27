@@ -64,7 +64,7 @@ Use Astra DB when you want Cassandra’s access pattern — **known partition, p
 
 A few joins are not a reason to reject Astra. Implement them in the data model and application (extra query tables, denormalization, dual-write). Join-centric systems and ad-hoc SQL as the product belong on a relational store or warehouse.
 
-Platform caveats (consistency, partition design, ignored table properties, ANN vs KNN, vector capacity) are on the [architecture review checklist](../ARCHITECTURE-REVIEW-CHECKLIST.md).
+For design review (access patterns, partitions, consistency, table properties, vector search, capacity), use the [architecture review checklist](../ARCHITECTURE-REVIEW-CHECKLIST.md).
 
 ## How is Astra DB different from self-managed Cassandra?
 
@@ -90,20 +90,20 @@ flowchart LR
 | Topic | Self-managed Cassandra | Astra DB Serverless |
 |---|---|---|
 | Nodes, gossip, snitches | You | Platform |
-| Replication | You choose | Fixed per region; not editable. See [database limits](https://docs.datastax.com/en/astra-db-serverless/databases/database-limits.html) |
-| Compaction | You tune | Platform-managed (UCS). Unsupported table properties (`compaction`, `gc_grace_seconds`, caching) are [ignored](https://docs.datastax.com/en/astra-db-serverless/cql/develop-with-cql.html) |
+| Replication | You choose | Replication factor **3**, across **three availability zones** in the region; not editable. See [database limits](https://docs.datastax.com/en/astra-db-serverless/databases/database-limits.html) |
+| Compaction | You tune | Platform-managed **Unified Compaction Strategy (UCS)**. It unifies STCS and LCS, supports time-series, and is chosen for you — no compaction config. `WITH compaction`, `gc_grace_seconds`, and caching are [ignored](https://docs.datastax.com/en/astra-db-serverless/cql/develop-with-cql.html). |
 | `CREATE KEYSPACE` in CQL | Yes | No — portal or DevOps API |
-| `nodetool` / JMX | Daily tools | Not available |
+| `nodetool` / JMX | Daily tools | Not available, and not needed |
 | Write CL `ONE` / `ANY` / `LOCAL_ONE` | Allowed | Disallowed |
-| Data API | Not the product surface | Recommended for new application development in this workshop; CQL drivers remain fully supported |
+| Data API | Not the product surface | Simpler application API for new development (this workshop). CQL drivers remain fully supported. |
 | Capacity | Cluster size | On-demand or [PCU groups](https://docs.datastax.com/en/astra-db-serverless/administration/provisioned-capacity-units.html) (module 04) |
 
-The storage engine is still Cassandra-shaped. **Your partitions, clustering, TTLs, and tombstones still matter.** What disappears is cluster administration.
+Astra DB still uses Cassandra’s data model. **Partitions, clustering, TTLs, and tombstones still matter.** What goes away is cluster administration.
 
 ## Shared responsibility (short)
 
 - **You:** data, data model, application, tokens, access, deletion policy, DR *plan*
-- **The service:** managed database software and virtual infrastructure
+- **The service:** managed database software, virtual infrastructure, and **automatic backups**
 - **The cloud provider:** physical datacenters
 
 Source: [Shared responsibility model](https://docs.datastax.com/en/astra-db-serverless/shared-responsibility-model.html). There is no Cassandra admin track in this workshop, because that work is not yours.

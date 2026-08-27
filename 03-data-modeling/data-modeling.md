@@ -98,23 +98,34 @@ These failure modes survive in Astra. The platform **warns on oversized partitio
 
 | Problem | What it looks like | Mitigation |
 |---|---|---|
-| **Hot partition** | One key (one tenant, one “global” id) gets most traffic | Spread keys; add a hash or time bucket |
-| **Wide partition** | One partition grows without bound | Bucket; TTL; archive |
-| **Unbounded clustering** | `PRIMARY KEY (user_id, event_time)` forever | Bucket by day/hour |
+| **Hot partition** | One key (one tenant, one “global” id) takes most reads and writes. The partition can be small and still hurt: that one replica set is the bottleneck. | Spread keys; add a hash or time bucket so traffic is not one partition |
+| **Wide partition** | One partition keeps growing (rows, cells, tombstones). Reads slow down; Astra warns on oversized partitions. | Bucket; TTL; archive old buckets |
+| **Unbounded clustering** | `PRIMARY KEY (user_id, event_time)` with no bucket: every event for that user lands in **one** partition forever. Clustering order does not cap size. | Put a day/hour bucket in the **partition** key: `((user_id, bucket), event_time)` |
 
 Unhealthy partitions cause latency and tombstone scans. You cannot `nodetool compact` your way out of a bad key on Astra.
 
 ## TTL, deletes, and tombstones
 
-A delete is a **write** of a tombstone. TTL expiry is the same idea: a marker that the data is gone.
+A `DELETE` is a **write** of a tombstone **now**. That marker is **extra data** in the SSTable. Readers must scan it until compaction drops it.
 
-Tombstones must be compacted away later. Warn and fail thresholds are platform-set. You **cannot** set `gc_grace_seconds` — that property is **ignored**.
+A TTL on insert/update is **not** a tombstone. You write the **live cell** plus an expiry time. After expiry, **clients no longer see the data**. The expired cell is still the original payload sitting in the SSTable until compaction removes it — you did **not** add a delete marker at write time.
+
+How much you delete changes what is written:
+
+| Operation | CQL shape | On disk at write |
+|---|---|---|
+| Cell / row delete | `DELETE … WHERE pk = ? AND clustering = ?` | Tombstone (extra data) per cell or row |
+| Whole partition | `DELETE FROM t WHERE pk = ?` (partition key only) | **One** partition tombstone covering that partition |
+| TTL | `USING TTL` or table `default_time_to_live` | Live data with expiry — **no** tombstone |
+
+A partition delete is much cheaper than deleting every clustering row. It still writes a tombstone **now**. For inbox/session **retention**, TTL is better: no delete job, no burst of tombstones. A partition delete is the right tool when you **mean** to drop a bucket (`DELETE FROM inbox_by_consumer WHERE consumer_id = ? AND bucket = ?`).
+
+Expired cells and tombstones both leave SSTable data until compaction. Warn and fail thresholds are platform-set. You **cannot** set `gc_grace_seconds` — that property is **ignored**.
 
 Practical rules:
 
-- Prefer **TTL** for sessions and inbox retention over mass `DELETE`.
-- Do not use a list and `DELETE list[i]` — Astra disables read-before-write list index operations.
-- Do not treat “we will compact more aggressively” as a design plan. You cannot choose compaction.
+- Prefer **TTL** for sessions and inbox retention over mass row `DELETE`. Mass row `DELETE` writes a tombstone per row (extra SSTable data) in one burst. TTL expires the live cells as they age — no tombstone at write. Compaction still has to drop expired cells. If you drop an **old time bucket** on purpose, use a **partition delete**, not one `DELETE` per event.
+- Do not treat “we will compact more aggressively” as a design plan. You cannot choose compaction (UCS is platform-managed), `gc_grace_seconds` is ignored, and `nodetool` is not available. If tombstones hurt, change the model (TTL, buckets, partition delete of old buckets, no mass row delete).
 
 ## Anti-patterns (still fatal)
 
@@ -126,7 +137,7 @@ Practical rules:
 | Unbounded partitions | Partition-size warnings, slow reads | Bucketing + TTL |
 | Too many columns on one table | Hits table column limits | Split tables or frozen UDTs / collections |
 
-SAI exists on Astra and is the right **secondary** index when you already have a partition key and need extra filters. It is **not** a substitute for query-first tables.
+**SAI (Storage-Attached Index)** exists on Astra. Use it as a **secondary** filter **after** the query already hits a partition key (for example, `status` inside `user_id`). It is **not** a substitute for query-first tables: “find user by email” is still `users_by_email`, not an index on a users table. Index counts are limited — see [database limits](https://docs.datastax.com/en/astra-db-serverless/databases/database-limits.html). SAI reference: [CQL for Astra DB](https://docs.datastax.com/en/astra-db-serverless/cql/develop-with-cql.html#use-storage-attached-indexing-sai).
 
 `ALLOW FILTERING` may work on a toy table. It is not a production access pattern.
 
@@ -146,9 +157,9 @@ Knowledge Search is a **collection**, not a CQL primary key. It is taught in [mo
 
 ## Lab
 
-Open **[Lab 1 — Develop with CQL](../labs/lab-1-cql.md)** and complete **Part A (Identity)**.
+Do these in order:
 
-Stop at Part B until you have read [module 04](../04-astra-specific-behavior/astra-specific-behavior.md).
+**Now:** [Lab 1 — Develop with CQL](../labs/lab-1-cql.md) **Part A (Identity)** — create the identity tables, insert, select by partition key.
 
 ## Next
 
