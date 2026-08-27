@@ -2,8 +2,6 @@
 
 One application. No Spring Boot. The goal is Astra DB, not a framework course.
 
-This module starts **[Lab 2 — Develop with the Data API](../labs/lab-2-data-api.md)** (part A: connect, write, read).
-
 ## Which Java library?
 
 | Library | When |
@@ -102,7 +100,7 @@ Source: [Java driver](https://docs.datastax.com/en/astra-db-serverless/drivers/j
 
 ## Lab
 
-Open [`sample-app`](../sample-app/sample-app.md) and complete **[Lab 2 Part A](../labs/lab-2-data-api.md)**.
+**Now:** [Lab 2 — Develop with the Data API](../labs/lab-2-data-api.md) **Part A** — connect, write, and read `users_by_id` (see [`sample-app`](../sample-app/sample-app.md)).
 
 ## Next
 

@@ -97,7 +97,7 @@ This fails without `ALLOW FILTERING` because `email` is not the partition key. N
 SELECT * FROM users_by_id WHERE email = 'alex@example.com' ALLOW FILTERING;
 ```
 
-It may return a row on this tiny table. That does **not** make it a production path. The production path is `users_by_email`.
+It may return a row on this tiny table. `ALLOW FILTERING` lets CQL scan and match a **non-key** column (here `email`). That scan hits every partition you read; it will not stay fast as the table grows. It is **not** a production path. The production path is `users_by_email`.
 
 **Part A deliverable:** You can explain why identity is four tables, not one.
 
@@ -187,6 +187,6 @@ Why is this the wrong primary access pattern even when it works?
 
 ## Next
 
-Return to [module 04](../04-astra-specific-behavior/astra-specific-behavior.md) if you still need to finish reading, then go to [05 Java development](../05-java-development/java-development.md).
+[05 — Java development](../05-java-development/java-development.md) (starts Lab 2).
 
 Compare with [solutions/lab-1-cql.cql](../solutions/lab-1-cql.cql).
