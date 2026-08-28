@@ -139,7 +139,7 @@ ANN neighbours for topic=identity:
 
 ## Wrap-up
 
-This is the end of the workshop. There is no seventh module. The 10-minute buffer in a live session is this page plus the [decision tree](../01-why-astra-db/why-astra-db.md).
+This is the end of the workshop. There is no seventh module. Recap here and walk the [decision tree](../01-why-astra-db/why-astra-db.md) once more.
 
 You can now answer:
 

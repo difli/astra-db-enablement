@@ -39,7 +39,7 @@ Solution architects, developers, data engineers, technical consultants, solution
 
 There are **two labs**, one per primary API. Hands-on is on the module pages: CQL in [03](03-data-modeling/data-modeling.md)–[04](04-astra-specific-behavior/astra-specific-behavior.md), Java Data API in [05](05-java-development/java-development.md)–[06](06-data-api-and-vector-search/data-api-and-vector-search.md).
 
-Suggested delivery time is in [FACILITATOR.md](FACILITATOR.md). Module pages do not carry a stopwatch. Numeric quotas are not copied into the modules; use [database limits](https://docs.datastax.com/en/astra-db-serverless/databases/database-limits.html).
+About **two hours**. Module pages do not carry a stopwatch. Numeric quotas are not copied into the modules; use [database limits](https://docs.datastax.com/en/astra-db-serverless/databases/database-limits.html).
 
 ## Use cases
 
@@ -81,5 +81,3 @@ Astra DB Serverless documentation wins whenever it conflicts with Cassandra folk
 1. Complete [00 Get started](00-get-started/get-started.md)
 2. Work through modules 01–06 in order (labs run on those pages)
 3. Take-home: [reference architectures](reference-architectures/reference-architectures.md) and the [architecture review checklist](ARCHITECTURE-REVIEW-CHECKLIST.md)
-
-If you are delivering this as a session, read [FACILITATOR.md](FACILITATOR.md) first.
