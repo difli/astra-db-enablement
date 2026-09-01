@@ -51,8 +51,6 @@ Three customer-neutral patterns. Sketches: [reference architectures](reference-a
 | Event Inbox | Deduplication, TTL, bucketing, tombstones, Astra DDL limits |
 | Knowledge Search | Collections, embeddings, ANN vector search, metadata filters |
 
-No customer names. No industry lock-in.
-
 ## What you need
 
 - An Astra account (free plan is enough for the labs)
