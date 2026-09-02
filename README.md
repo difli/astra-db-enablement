@@ -1,5 +1,7 @@
 # Astra DB Enablement
 
+![Astra DB Enablement Workshop — operational data and Knowledge Search](assets/astra-db-enablement.png)
+
 Workshop in a Box for developers and architects who need to become productive with **Astra DB Serverless**.
 
 This is not Apache Cassandra administrator training. It is not a multi-day certification. It is a focused, hands-on path you can complete in about **two hours**.
