@@ -281,7 +281,7 @@ Expected: Alex's row. The query lands on one partition first (`user_id`), then S
 SELECT * FROM users_by_id WHERE email = 'alex@example.com';
 ```
 
-This fails without `ALLOW FILTERING` because `email` is not the partition key.
+This fails without `ALLOW FILTERING` because `email` is not the partition key and there is no SAI index on it.
 
 Expected: an error that the query might involve data filtering (not a row).
 
@@ -291,7 +291,9 @@ Now try:
 SELECT * FROM users_by_id WHERE email = 'alex@example.com' ALLOW FILTERING;
 ```
 
-Expected: Alex's row on this tiny table. `ALLOW FILTERING` lets CQL scan and match a **non-key** column (here `email`). That scan hits every partition in the table; it will not stay fast as the table grows. It is **not** a production path. The production path is `users_by_email` — a partition hit, not a scan.
+Expected: Alex's row on this tiny table. `ALLOW FILTERING` lets CQL scan and match a **non-key** column (here `email`). That scan hits every partition in the table; it will not stay fast as the table grows. It is **not** a production path.
+
+> **What about a SAI index on `email`?** Adding `CREATE CUSTOM INDEX ON users_by_id (email) USING 'StorageAttachedIndex'` would make this query work *without* `ALLOW FILTERING` — and that is precisely the trap. The query looks clean, it succeeds, and on a small table it feels fast. But it is still a cluster-wide index fan-out on every read, index counts are limited, and it gives you no partition locality. The production path is `users_by_email`: a single partition hit, zero index overhead, no limit concerns.
 
 **Deliverables:**
 - You can explain why identity is four tables, not one
