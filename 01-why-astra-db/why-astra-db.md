@@ -8,8 +8,6 @@ This module answers:
 4. When should I **not** use it?
 5. How is it different from self-managed Cassandra?
 
-The decision tree below is the discussion. After the workshop, use the [reference architectures](../reference-architectures/reference-architectures.md) one-pager, the [architecture review checklist](../ARCHITECTURE-REVIEW-CHECKLIST.md), and the [Oracle to Astra DB assessment](../ORACLE-TO-ASTRA-ASSESSMENT.md) for modernization opportunity discovery.
-
 ## What is Astra DB?
 
 **Astra DB Serverless** is a multi-cloud database-as-a-service built on Apache Cassandra. It is optimized for operational workloads that need large data volume, low latency, and flexible data models — including vector search. You get a production-ready database from the start: no cluster to build, and no Cassandra operational settings to tune. On-demand capacity **autoscales** with usage.
