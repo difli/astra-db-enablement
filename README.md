@@ -29,7 +29,7 @@ Solution architects, developers, data engineers, technical consultants, solution
 
 | Module | What it is |
 |---|---|
-| [00 Get started](00-get-started/get-started.md) | Pre-work: account, database, token |
+| [00 Get started](00-get-started/get-started.md) | Account, database, token |
 | [01 Why Astra DB](01-why-astra-db/why-astra-db.md) | Decision tree: fit, non-fit, vs self-managed Cassandra |
 | [02 Astra fundamentals](02-astra-fundamentals/astra-fundamentals.md) | Databases, keyspaces, tables vs collections, tokens |
 | [03 Data modelling](03-data-modeling/data-modeling.md) | Query-first design. Starts **Lab 1 (CQL)** |

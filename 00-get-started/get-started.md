@@ -1,8 +1,15 @@
 # 00 — Get started
 
-Do this **before** the workshop. The two-hour session assumes you already have a database.
+Clone this repository, then create your Astra account, database, and token. Later modules use them.
 
-This answers: *How do I get started immediately?*
+## Clone this repository
+
+```bash
+git clone https://github.com/difli/astra-db-enablement.git
+cd astra-db-enablement
+```
+
+You need the repo on your machine for the Java lab. After you create the database, you will put the endpoint and token in `.env` here.
 
 ## Create an Astra account
 
@@ -21,6 +28,8 @@ You cannot create a keyspace with CQL on Astra DB. Keyspaces are created in the 
 
 ## Copy connection details
 
+In the repository root, copy `.env.example` to `.env` and fill in `API_ENDPOINT`, `APPLICATION_TOKEN`, and `KEYSPACE_NAME`. `.env` is gitignored. Saving the file is not enough: Java does not read `.env`. Before you run Maven, load the variables in that same terminal (commands in **Set environment variables for Lab 2** below).
+
 From the database page, copy:
 
 | Value | Used for |
@@ -31,8 +40,6 @@ From the database page, copy:
 
 Generate the token from the **Overview** tab, **Database Details**, **Generate token**. Store it like a password. The portal shows it once.
 
-Clone this repository if you have not already. In the repository root, copy `.env.example` to `.env` and fill in `API_ENDPOINT`, `APPLICATION_TOKEN`, and `KEYSPACE_NAME`. `.env` is gitignored. Then load those values into the Maven terminal (Java does not read `.env` by itself).
-
 You do **not** need a Secure Connect Bundle for this workshop. The SCB is for the Cassandra Java driver and `cqlsh` outside the portal. Lab 2 is the Java lab: it uses the Data API client (`astra-db-java`) with endpoint + token.
 
 ## Confirm the CQL console
@@ -41,7 +48,7 @@ You do **not** need a Secure Connect Bundle for this workshop. The SCB is for th
 2. Click **CQL console**.
 3. Wait for the `token@cqlsh>` prompt (this session uses your portal login, not the application token).
 
-If the prompt appears, pre-work for Lab 1 is done. Lab 2 also needs this repository cloned on your machine.
+If the prompt appears, you are ready for the CQL lab in [module 03](../03-data-modeling/data-modeling.md).
 
 ## Set environment variables for Lab 2
 

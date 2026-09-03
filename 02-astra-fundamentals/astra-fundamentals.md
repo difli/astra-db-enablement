@@ -19,7 +19,7 @@ flowchart TB
 
 | Term | Meaning |
 |---|---|
-| **Database** | The Astra resource you created in pre-work. Region is chosen at create time. |
+| **Database** | The Astra resource you created in [module 00](../00-get-started/get-started.md). Region is chosen at create time. |
 | **Keyspace** | A container for tables and collections. Created in the portal or DevOps API, **not** with CQL `CREATE KEYSPACE`. |
 | **Table** | Fixed schema. Rows and columns. Best for structured, query-first data (identity, inbox). |
 | **Collection** | Dynamic schema. Documents and fields. Best for semi-structured data and Knowledge Search. |
