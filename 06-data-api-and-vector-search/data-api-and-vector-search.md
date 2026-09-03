@@ -1,26 +1,31 @@
 # 06 — Data API and vector search
 
-A correct mental model, not a RAG course. At the end of this page you run Knowledge Search in Java.
+This module builds the mental model for vector search on Astra DB — what it is, what it is not, and how to use it correctly from Java. It is not a RAG course; the goal is to understand the mechanics well enough to use them without surprises.
+
+**By the end you should be able to:**
+- Explain what ANN vector search does and where it fits alongside CQL tables
+- Describe when to use a collection vs a table with a vector column
+- Run Knowledge Search in Java: insert documents with embeddings, query by similarity, and narrow results with a metadata filter
 
 Sources: [Vector search](https://docs.datastax.com/en/astra-db-serverless/databases/vector-search.html), [Vector concepts](https://docs.datastax.com/en/astra-db-serverless/get-started/vector-concepts.html), [Data API](https://docs.datastax.com/en/astra-db-serverless/api-reference/dataapiclient.html).
 
 ## What vector search is
 
-1. Store embeddings (float arrays) with each document or row.
-2. Embed the query with the **same model**.
-3. Search for **similar** vectors.
-4. Optionally **filter** on metadata together with the vector sort.
+At its core, vector search is a four-step workflow:
 
-Astra DB uses **approximate nearest neighbour (ANN)**, not exact KNN. ANN may miss the mathematically perfect neighbour. That is expected.
+1. **Store** — each document or row is saved with an embedding: a float array that represents its meaning numerically.
+2. **Embed the query** — at query time, convert the user's input into a vector using the **same model** used at insert time.
+3. **Search for similar vectors** — Astra finds the stored vectors closest to the query vector.
+4. **Filter optionally** — narrow the candidate set with a metadata filter (for example `topic = "identity"`) before or alongside the vector sort.
+
+Astra DB uses **approximate nearest neighbour (ANN)**, not exact KNN. ANN may miss the mathematically perfect neighbour. That is expected and is a deliberate performance trade-off.
 
 ## What vector search is not
 
-- Not a replacement for `WHERE user_id = ...`. Identity stays on tables.
-- Not exact match.
-- Not multi-region **vector-query HA** today (module 04). Extra regions can replicate documents; they do not add another vector PCU.
-- Vectors are not human-readable. Model choice matters; **same model** for insert and query is mandatory.
-
-Metadata filters narrow the set (for example `topic = "identity"`). Use them.
+- **Not a replacement for `WHERE user_id = ?`** — structured identity and inbox lookups stay on CQL tables with a partition key.
+- **Not exact match** — ANN returns the closest results, not a guaranteed exact hit.
+- **Not multi-region vector-query HA** — extra regions replicate documents but do not add vector-query capacity; each region has a one-PCU ceiling (see [module 04](../04-astra-specific-behavior/astra-specific-behavior.md)).
+- **Not model-agnostic** — vectors are not human-readable; the embedding model is baked into the numbers. You must use the **same model** for insert and query or results are meaningless.
 
 ## Knowledge Search
 
