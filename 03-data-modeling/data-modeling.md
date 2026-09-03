@@ -2,7 +2,7 @@
 
 This is the most important technical module. Astra DB will not save a relational schema.
 
-If you have not yet qualified the application, start with the [Astra DB Workload Assessment](../ASTRA-DB-WORKLOAD-ASSESSMENT.md).
+If you have not yet qualified the application, start with the [Astra DB Architect Guide](../ASTRA-DB-ARCHITECT-GUIDE.md).
 
 At the end of this page you create the identity tables in the CQL console.
 

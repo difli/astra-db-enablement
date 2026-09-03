@@ -24,7 +24,7 @@ Metadata filters narrow the set (for example `topic = "identity"`). Use them.
 
 ## Knowledge Search
 
-Use case 3 — embed documents, retrieve by similarity **and** metadata. Sketch: [reference architectures](../reference-architectures/reference-architectures.md).
+Use case 3 — embed documents, retrieve by similarity **and** metadata. Sketch: [Astra DB Architect Guide](../ASTRA-DB-ARCHITECT-GUIDE.md#33-knowledge-search).
 
 | Field | Role |
 |---|---|
@@ -153,7 +153,7 @@ You can now answer:
 | Which constraints matter? | Unsupported `WITH` is a **warning**. `CREATE KEYSPACE` is an **error**. Vector PCU is **one unit**. Numbers: [database limits](https://docs.datastax.com/en/astra-db-serverless/databases/database-limits.html). |
 | Common mistakes? | `ALLOW FILTERING` as the email lookup. Compaction in DDL. Extra regions as vector-query HA. |
 
-Take-home (not on the clock): [Astra DB Workload Assessment](../ASTRA-DB-WORKLOAD-ASSESSMENT.md), [Oracle to Astra DB assessment](../ORACLE-TO-ASTRA-ASSESSMENT.md) if the source is Oracle, [reference architectures](../reference-architectures/reference-architectures.md), [data modelling](../03-data-modeling/data-modeling.md), and the [architecture review checklist](../ARCHITECTURE-REVIEW-CHECKLIST.md).
+Take-home (not on the clock): [Astra DB Architect Guide](../ASTRA-DB-ARCHITECT-GUIDE.md). If the source is Oracle: [Oracle to Astra DB assessment](../ORACLE-TO-ASTRA-ASSESSMENT.md).
 
 ## Optional next reading
 

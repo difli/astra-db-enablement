@@ -10,9 +10,7 @@ The question is not “should we replace Oracle?” The question is:
 
 **How do I identify Oracle workloads that are good Astra DB candidates?**
 
-If you are evaluating a workload independent of a source platform, start with the [Astra DB Workload Assessment](ASTRA-DB-WORKLOAD-ASSESSMENT.md). Use this document when the workload already runs on Oracle and migration questions must be addressed.
-
-After this Oracle-specific document: [Why Astra DB](01-why-astra-db/why-astra-db.md) → [reference architectures](reference-architectures/reference-architectures.md) → [data modelling](03-data-modeling/data-modeling.md) → [architecture review checklist](ARCHITECTURE-REVIEW-CHECKLIST.md).
+If you are evaluating a workload independent of a source platform, use the [Astra DB Architect Guide](ASTRA-DB-ARCHITECT-GUIDE.md). Use this document when the workload already runs on Oracle and migration questions must be addressed.
 
 ---
 
@@ -91,7 +89,7 @@ These are not defects. They are **relational strengths**. They also tell you how
 - Is this **operational data** rather than reporting data?
 - Would high write throughput or multi-region presence help this workload?
 
-If yes, this is a candidate. Platform caveats (consistency, ignored table properties, vector capacity) belong on the [architecture review checklist](ARCHITECTURE-REVIEW-CHECKLIST.md), not in this screen.
+If yes, this is a candidate. Platform caveats (consistency, ignored table properties, vector capacity) belong in a design review after the target model exists, not in this screen. The [Astra DB Architect Guide](ASTRA-DB-ARCHITECT-GUIDE.md) has that review.
 
 ### Step 5 — Estimate migration effort
 
@@ -180,7 +178,7 @@ The storage engine is still wide-row / partition oriented. **You** own the data 
 
 - **Choose migration tooling only after defining the target model.** Oracle-to-Astra is not a Cassandra rehosting exercise. Cassandra-family ZDM and SSTable migration tools do not automatically convert an Oracle schema, joins, or PL/SQL into an Astra model.
 
-Worked shapes for identity, inbox, and knowledge search: [reference architectures](reference-architectures/reference-architectures.md).
+Worked shapes for identity, inbox, and knowledge search, and the final design review: [Astra DB Architect Guide](ASTRA-DB-ARCHITECT-GUIDE.md).
 
 #### What a feasible migration usually looks like
 
@@ -212,7 +210,7 @@ Ten yes/no questions. Use them in a discovery call. You do not need a perfect sc
 - [ ] Can reporting stay on Oracle or move to a warehouse, rather than live on the same access path?
 - [ ] Can the team change the application (model, dual-write, identifiers) as part of the move?
 
-**Mostly yes** → strong Astra candidate. Continue with the [architecture review checklist](ARCHITECTURE-REVIEW-CHECKLIST.md) and a query-first model.
+**Mostly yes** → strong Astra candidate. Continue with a query-first model ([module 03](03-data-modeling/data-modeling.md)) and the review in the [Astra DB Architect Guide](ASTRA-DB-ARCHITECT-GUIDE.md).
 
 **Mostly no** → not a forced fit. Either split out a green slice, or keep the workload on Oracle and look for a better candidate elsewhere in the estate.
 
@@ -222,18 +220,11 @@ Ten yes/no questions. Use them in a discovery call. You do not need a perfect sc
 
 ```mermaid
 flowchart LR
-  disc["Opportunity discovery this document"] --> review["Architecture review"]
-  review --> model["Data modelling"]
-  model --> plan["Migration planning"]
+  disc["Opportunity discovery this document"] --> model["Data modelling"]
+  model --> review["Architecture review"]
+  review --> plan["Migration planning"]
 ```
 
-| Stage | Use |
-|---|---|
-| Opportunity discovery | This document |
-| Where Astra is a strong fit | [Why Astra DB](01-why-astra-db/why-astra-db.md) (decision tree) |
-| Target shapes | [Reference architectures](reference-architectures/reference-architectures.md) |
-| Architecture review | [Architecture review checklist](ARCHITECTURE-REVIEW-CHECKLIST.md) |
-| Data modelling | Workshop [03 Data modelling](03-data-modeling/data-modeling.md) when you run the enablement path |
-| Platform limits | [Database limits](https://docs.datastax.com/en/astra-db-serverless/databases/database-limits.html) |
+Representative architectures and design review: [Astra DB Architect Guide](ASTRA-DB-ARCHITECT-GUIDE.md). Detailed table modelling: [03 Data modelling](03-data-modeling/data-modeling.md). Numeric quotas: [database limits](https://docs.datastax.com/en/astra-db-serverless/databases/database-limits.html).
 
 Do not start with a full-schema dump. Start with one green workload, name the queries, and design the Astra tables (or collection) for those queries. Leave reporting and join-centric OLTP on the engine that already does them well.

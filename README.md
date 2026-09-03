@@ -43,8 +43,6 @@ About **two hours**. Module pages do not carry a stopwatch. Numeric quotas are n
 
 ## Use cases
 
-Three customer-neutral patterns. Qualify a named application with the [Astra DB Workload Assessment](ASTRA-DB-WORKLOAD-ASSESSMENT.md). Sketches: [reference architectures](reference-architectures/reference-architectures.md). Review questions: [architecture review checklist](ARCHITECTURE-REVIEW-CHECKLIST.md).
-
 | Pattern | Used to teach |
 |---|---|
 | Enterprise Identity Platform | Fast lookups, query-first tables, Java CRUD |
@@ -77,10 +75,9 @@ Astra DB Serverless documentation wins whenever it conflicts with Cassandra folk
 
 When you finish, walk the [decision tree](01-why-astra-db/why-astra-db.md) (questions 2–5).
 
-For later (architecture path):
+## Take-home guides
 
-1. [Astra DB Workload Assessment](ASTRA-DB-WORKLOAD-ASSESSMENT.md) — generic workload qualification
-2. [Oracle to Astra DB assessment](ORACLE-TO-ASTRA-ASSESSMENT.md) — if the source is Oracle
-3. [Reference architectures](reference-architectures/reference-architectures.md)
-4. [03 Data modelling](03-data-modeling/data-modeling.md)
-5. [Architecture review checklist](ARCHITECTURE-REVIEW-CHECKLIST.md)
+Modules 00–06 are the workshop. These two guides are optional take-home resources.
+
+- [Astra DB Architect Guide](ASTRA-DB-ARCHITECT-GUIDE.md) — workload qualification, representative architectures, and architecture review
+- [Oracle to Astra DB assessment](ORACLE-TO-ASTRA-ASSESSMENT.md) — Oracle-specific opportunity and migration assessment

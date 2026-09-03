@@ -81,9 +81,7 @@ Use Astra DB when you need scalable operational data serving, predictable low-la
 
 A few joins are not a reason to reject Astra DB. Implement them in the data model and application (extra query tables, denormalization, dual-write). Join-centric systems and ad-hoc SQL as the product belong on a relational store or warehouse.
 
-Need a deeper workload assessment? Use the [Astra DB Workload Assessment](../ASTRA-DB-WORKLOAD-ASSESSMENT.md). It helps architects evaluate applications, identify access patterns, classify workloads, and determine whether Astra DB deserves further investigation before data modelling begins.
-
-After you have a design, use the [architecture review checklist](../ARCHITECTURE-REVIEW-CHECKLIST.md).
+Need a deeper assessment of a named application? Use the [Astra DB Architect Guide](../ASTRA-DB-ARCHITECT-GUIDE.md). It covers workload qualification, representative patterns, and design review before you accept a model.
 
 ## How is Astra DB different from self-managed Cassandra?
 
