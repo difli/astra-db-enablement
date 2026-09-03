@@ -2,9 +2,7 @@
 
 Cassandra-experienced teams need this module most. Astra DB will **accept** statements that look like admin CQL and then **quietly not do** what you asked.
 
-At the end of this page you create the inbox table and run the ignored-`WITH` and `CREATE KEYSPACE` demonstrations.
-
-Quotas change. Treat [database limits](https://docs.datastax.com/en/astra-db-serverless/databases/database-limits.html) as the live list. This page teaches **behaviour**.
+Numbers change — consult [database limits](https://docs.datastax.com/en/astra-db-serverless/databases/database-limits.html) for current quotas.
 
 ## Unsupported table properties are ignored
 
@@ -42,10 +40,15 @@ Keyspaces are created in the **Astra Portal** or the **DevOps API**. UDTs are su
 - Data API reads and writes use **`LOCAL_QUORUM`**.
 - CQL reads: all consistency levels.
 - CQL writes: all levels **except** `ONE`, `ANY`, `LOCAL_ONE`.
-- You cannot `UPDATE`/`DELETE` a list **by index** (no read-before-write list ops).
+- You cannot `UPDATE`/`DELETE` a list **by index** (no read-before-write list ops). The following is rejected:
+  ```sql
+  UPDATE t SET tags[0] = 'new' WHERE id = ?;   -- index update, not allowed
+  DELETE tags[0] FROM t WHERE id = ?;           -- index delete, not allowed
+  ```
+  Use append/prepend/discard instead, or model the list elements as clustering rows in a separate table.
 - You cannot edit `cassandra.yaml`.
 
-Current numeric guardrails (tables per database, columns, cell size, indexes, rate limits, partition-size warnings, free-plan caps) live only in [database limits](https://docs.datastax.com/en/astra-db-serverless/databases/database-limits.html). Design against that page, not against a workshop copy.
+Current numeric guardrails (tables per database, columns, cell size, indexes, rate limits, partition-size warnings, free-plan caps) live only in [database limits](https://docs.datastax.com/en/astra-db-serverless/databases/database-limits.html). Design against that page.
 
 Idle on-demand databases can feel cold on a sudden spike. Warm them before a launch, or use PCUs.
 
@@ -112,7 +115,7 @@ FROM inbox_by_consumer
 WHERE consumer_id = 'billing-service' AND bucket = '2026-08-26';
 ```
 
-Expected: **two** rows (two `event_id`s), `invoice.failed` first (`event_time DESC`). The duplicate `invoice.paid` insert did not create a third row.
+Expected: **two** rows — one `invoice.paid`, one `invoice.failed`. `invoice.failed` appears first because the table is sorted newest-first (`event_time DESC`). The second `invoice.paid` insert was a no-op: same primary key, same row.
 
 ### B2. The ignored `WITH` trap
 
@@ -126,13 +129,23 @@ CREATE TABLE IF NOT EXISTS inbox_with_cassandra_habits (
    AND caching = {'keys': 'ALL'};
 ```
 
-Expected: the table is **created**, plus a **warning** that unsupported properties were ignored. This is not a failure.
+Expected: the table is **created** and Astra returns a warning listing every ignored property:
+
+```
+Warnings: Ignoring provided values [caching, compaction, gc_grace_seconds] as they are not
+supported for Table Properties (ignored values are: [additional_write_policy,
+bloom_filter_fp_chance, caching, cdc, compaction, compression, crc_check_chance,
+gc_grace_seconds, id, max_index_interval, memtable, memtable_flush_period_in_ms,
+min_index_interval, nodesync, read_repair, speculative_retry])
+```
+
+This is not a failure — the table exists. But none of those settings were applied.
 
 ```sql
 DESCRIBE TABLE inbox_with_cassandra_habits;
 ```
 
-Expected: `DESCRIBE` does **not** show LCS, `gc_grace_seconds`, or your caching clause as settings you control. UCS is the platform strategy.
+Expected: `DESCRIBE` does **not** show LCS, `gc_grace_seconds`, or your caching clause. UCS is the platform strategy and you have no control over it.
 
 ### B3. Keyspaces are not CQL
 
@@ -141,7 +154,13 @@ CREATE KEYSPACE IF NOT EXISTS workshop_ks
   WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};
 ```
 
-Expected: an **error**, not a warning. The keyspace is not created. Create keyspaces in the Astra Portal or DevOps API. Replication is platform-controlled; see [replicas and consistency](https://docs.datastax.com/en/astra-db-serverless/databases/database-limits.html#replicas-and-consistency).
+Expected: an **Unauthorized error**, not a warning — the keyspace is not created:
+
+```
+Unauthorized: Error from server: code=2100 [Unauthorized] message="Missing correct permission on workshop_ks."
+```
+
+Create keyspaces in the Astra Portal or DevOps API. Replication is platform-controlled; see [replicas and consistency](https://docs.datastax.com/en/astra-db-serverless/databases/database-limits.html#replicas-and-consistency).
 
 **Deliverable:** Inbox is idempotent and bucketed; you have seen a warning for ignored table properties; you have seen `CREATE KEYSPACE` reject.
 
