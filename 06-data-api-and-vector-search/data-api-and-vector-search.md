@@ -29,7 +29,7 @@ Vector search at scale uses **approximate nearest neighbour (ANN)** — this is 
 
 ## Knowledge Search
 
-Use case 3 — embed documents, retrieve by similarity **and** metadata. Sketch: [Astra DB Architect Guide](../ASTRA-DB-ARCHITECT-GUIDE.md#33-knowledge-search).
+Use case 3 — embed documents, retrieve by similarity **and** metadata. Read through the code and field table below first; the lab at the end of this page asks you to run it and explain what you see. Sketch: [Astra DB Architect Guide](../ASTRA-DB-ARCHITECT-GUIDE.md#33-knowledge-search).
 
 | Field | Role |
 |---|---|
@@ -88,7 +88,9 @@ From [module 04](../04-astra-specific-behavior/astra-specific-behavior.md) and [
 
 ## Lab — Knowledge Search (collection + ANN)
 
-The code is above and in [`KnowledgeSearchApp.java`](../sample-app/src/main/java/com/datastax/enablement/KnowledgeSearchApp.java). Same Maven project and environment variables as [module 05](../05-java-development/java-development.md).
+In this lab you run `KnowledgeSearchApp` — the class shown in the **Knowledge Search** section above. It creates a collection called `knowledge`, inserts four short help-centre articles each with a pre-computed embedding, then queries by vector similarity filtered to `topic=identity`. You should get back the two most relevant identity articles.
+
+The app uses the same Maven project and environment variables as [module 05](../05-java-development/java-development.md) — no extra setup needed.
 
 ```bash
 test -f pom.xml || cd sample-app
@@ -105,16 +107,24 @@ ANN neighbours for topic=identity:
   {"_id":"k2","topic":"identity","text":"Find an employee by work email…"}
 ```
 
-Four documents were inserted (`k1`–`k4`). Only **k1** and **k2** have `topic=identity`, so the filter drops finance/platform. `limit(3)` is a ceiling; two rows is correct. k1 first is expected (the query vector is closest to k1).
+What you are seeing:
+- Four documents (`k1`–`k4`) were inserted — two tagged `topic=identity`, two tagged with other topics.
+- The metadata filter `topic=identity` drops the non-identity documents before ANN runs.
+- `limit(3)` is the maximum; two results is correct because only two documents match the filter.
+- `k1` comes first because its embedding is the closest to the query vector.
 
 If it fails:
 
 | Symptom | Check |
 |---|---|
-| Collection create / index limit | Database already has too many collections — [database limits](https://docs.datastax.com/en/astra-db-serverless/databases/database-limits.html). Drop an unused collection, or reuse `knowledge` |
-| Neighbours from the wrong topic | The metadata filter was omitted. ANN without a filter is a grab bag |
+| Collection create / index limit | Database already has too many collections — [database limits](https://docs.datastax.com/en/astra-db-serverless/databases/database-limits.html). Drop an unused collection or reuse `knowledge` |
+| Results from the wrong topic | The metadata filter was not applied — ANN without a filter searches the whole collection |
+| `knowledge` not found | Environment variables not loaded — run `set -a && source .env && set +a` first |
 
-**Deliverable:** You can explain why the filter is there (vector search is similarity, not an ID lookup) and why extra regions do not give Knowledge Search extra vector-query capacity (module 04).
+**Deliverables:**
+- You can explain why the metadata filter is there (narrow by topic before similarity search, not after)
+- You can explain why two results come back instead of three
+- You can explain why extra regions do not add vector-query capacity
 
 ### Run both halves
 
