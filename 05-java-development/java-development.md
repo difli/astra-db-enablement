@@ -1,8 +1,15 @@
 # 05 — Java development
 
-One application. No Spring Boot. The goal is Astra DB, not a framework course.
+A single Java application — no Spring Boot, no framework overhead. This module is about how Astra DB works from Java code, not about the framework around it.
 
-Read this page first (client vs driver, connect, tables and collections). You run the sample app at the end of the module.
+**By the end you should be able to point to the exact line in the sample app that:**
+1. Creates the client and connects to the database
+2. Authenticates with a token
+3. Writes a row (`insertOne`)
+4. Reads a row (`findOne` / `find`)
+5. Queries with a filter on a table, and with a vector sort + filter on a collection
+
+The page explains the concepts. The sample app at the end puts them together.
 
 ## Which Java library?
 
@@ -45,14 +52,6 @@ The project in [`sample-app/sample-app.md`](../sample-app/sample-app.md) is the 
 | [`IdentityApp`](../sample-app/src/main/java/com/datastax/enablement/IdentityApp.java) | Table insert and find by partition key (Enterprise Identity) |
 | [`KnowledgeSearchApp`](../sample-app/src/main/java/com/datastax/enablement/KnowledgeSearchApp.java) | Collection insert and ANN search with a metadata filter |
 | [`WorkshopApp`](../sample-app/src/main/java/com/datastax/enablement/WorkshopApp.java) | Runs identity then Knowledge Search |
-
-Operations you must be able to point to in the code:
-
-1. **Connect**
-2. **Authenticate** (token)
-3. **Write** (`insertOne`)
-4. **Read** (`findOne` / `find`)
-5. **Query** (filter on a table; vector sort + filter on a collection)
 
 ## Tables through the Data API
 
