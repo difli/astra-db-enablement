@@ -66,8 +66,6 @@ Three customer-neutral patterns. Sketches: [reference architectures](reference-a
 - **CQL** where it teaches modelling and Astra-specific DDL behaviour
 - **Java** only — one sample application, no Spring Boot
 
-This repository does not cover Langflow, GraphQL, or the deprecated Document API.
-
 ## Source of truth
 
 Astra DB Serverless documentation wins whenever it conflicts with Cassandra folklore. Mapping: [SOURCES.md](SOURCES.md).
