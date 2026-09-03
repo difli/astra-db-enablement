@@ -57,7 +57,7 @@ flowchart TD
 
   design --> validation
 
-  validation{"Can the workload be shown to meet its requirements for scale, latency, availability, consistency, retention, and cost?"}
+  validation{"Would Astra DB meet the workload's performance, scalability, availability, retention, and cost requirements?"}
 
   validation -->|"Yes"| fit["Good Astra DB candidate"]
 
