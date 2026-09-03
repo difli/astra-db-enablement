@@ -60,8 +60,6 @@ Three customer-neutral patterns. Sketches: [reference architectures](reference-a
 - Apache Maven 3.9 or later
 - A browser
 
-You do **not** need Docker, a Cassandra cluster, Spring Boot, or `nodetool`.
-
 ## Primary API strategy
 
 - **Data API** first for application development (`astra-db-java`)
