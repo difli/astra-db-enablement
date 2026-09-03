@@ -261,7 +261,7 @@ Expected: inserts report no rows. The four `SELECT`s return **one** profile (Ale
 
 ### A3. SAI as a secondary filter (valid use)
 
-Add an SAI index on `status` inside `users_by_id`. The partition key (`user_id`) is still required — SAI narrows the result **within** a partition, it does not replace the partition key.
+Add an SAI index on `status` inside `users_by_id`. SAI is a cluster-wide index — it can technically work without a partition key, but that turns every query into a full cluster scan. The correct pattern is to always supply the partition key **first**, then use SAI as an additional filter on the result.
 
 ```sql
 CREATE CUSTOM INDEX IF NOT EXISTS ON users_by_id (status) USING 'StorageAttachedIndex';

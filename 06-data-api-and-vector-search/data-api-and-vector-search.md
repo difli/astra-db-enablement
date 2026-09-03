@@ -128,7 +128,12 @@ If it fails:
 
 ### Run both halves
 
-[`WorkshopApp.java`](../sample-app/src/main/java/com/datastax/enablement/WorkshopApp.java) calls module 05 then this lab:
+[`WorkshopApp.java`](../sample-app/src/main/java/com/datastax/enablement/WorkshopApp.java) ties the whole workshop together in a single run. Both calls go through the **same Data API client** — there is no driver switch, no second connection, no separate credentials:
+
+- **`IdentityApp.upsertAndRead`** — writes and reads a row in the `users_by_id` **table** (CQL schema, typed columns, partition-key lookup). This is the structured data path.
+- **`KnowledgeSearchApp.search`** — creates the `knowledge` **collection**, inserts documents with embeddings, and queries by vector similarity. This is the unstructured/search path.
+
+Both use the same `Database` object created once from your endpoint, token, and keyspace. The only difference is `getTable(...)` vs `getCollection(...)`.
 
 ```java
 IdentityApp.upsertAndRead(database);
