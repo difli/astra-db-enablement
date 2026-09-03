@@ -66,14 +66,12 @@ About **two hours**. Module pages do not carry a stopwatch. Numeric quotas are n
 
 ## Source of truth
 
-Astra DB Serverless documentation wins whenever it conflicts with Cassandra folklore. Mapping: [SOURCES.md](SOURCES.md).
+Astra DB Serverless documentation: [SOURCES.md](SOURCES.md).
 
 ## Start here
 
 1. Complete [00 Get started](00-get-started/get-started.md)
 2. Work through modules 01–06 in order (labs run on those pages)
-
-When you finish, walk the [decision tree](01-why-astra-db/why-astra-db.md) (questions 2–5).
 
 ## Take-home guides
 

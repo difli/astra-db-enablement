@@ -37,7 +37,7 @@ flowchart TD
   workload -->|"Semantic, vector, or hybrid retrieval"| access
   workload -->|"Operational + semantic retrieval"| access
 
-  workload -->|"Broad analytics, BI, ad-hoc SQL, joins"| analytical["Analytical platform, warehouse, or relational system is likely the primary fit"]
+  workload -->|"Analytics, BI, or warehouse-style reporting"| analytical["Analytical platform or warehouse is likely the primary fit"]
 
   workload -->|"Not yet known"| discovery["Define user journeys, critical queries, scale, latency, availability, and retention requirements"]
 
