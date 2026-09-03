@@ -69,8 +69,6 @@ Q4 is denormalisation: `users_by_email` stores `user_id` so “login by email”
 
 Sessions are short-lived. Give the table a **TTL** (`default_time_to_live`) rather than relying on a nightly delete job. Deletes and expired TTLs both create **tombstones** — see below.
 
-You will create these tables in the lab below.
-
 ## Use case 2 — Event Inbox Pattern
 
 ![Event Inbox — partitioning, bucketing, and idempotency](../assets/event-inbox.png)
@@ -94,11 +92,9 @@ Design choices:
 PRIMARY KEY ((consumer_id, bucket), event_time, event_id)
 ```
 
-You will create this in [module 04](../04-astra-specific-behavior/astra-specific-behavior.md), together with Astra DDL surprises.
-
 ## Partition health
 
-These failure modes survive in Astra. The platform **warns on oversized partitions**.
+These failure modes still apply in Astra.
 
 | Problem | What it looks like | Mitigation |
 |---|---|---|
@@ -136,7 +132,7 @@ Practical rules:
 | Anti-pattern | Why it hurts | Do this instead |
 |---|---|---|
 | One big relational table + `ALLOW FILTERING` | Coordinator scans | Table whose partition key matches the query |
-| Secondary index as the **primary** lookup (“find user by email”) | Extra index path, limits, wrong mental model | `users_by_email` table |
+| SAI as the **primary** lookup ("find user by email" on a `users` table) | Skips the partition key; every SAI query fans out across the cluster | `users_by_email` table — partition hit, not index fan-out |
 | LWT (`IF NOT EXISTS`) on a hot partition | Extra round-trips, contention | Idempotent primary key |
 | Unbounded partitions | Partition-size warnings, slow reads | Bucketing + TTL |
 | Too many columns on one table | Hits table column limits | Split tables or frozen UDTs / collections |
@@ -147,19 +143,29 @@ Practical rules:
 
 Numeric guardrails (partition warnings, column counts, index budgets) are in [database limits](https://docs.datastax.com/en/astra-db-serverless/databases/database-limits.html).
 
+When the query is **similarity** (`sort by $vector`), not `WHERE pk =`, the right tool is ANN vector search — either a **collection** (schema-flexible, document-shaped) or a **table with a vector column** (CQL primary key + vector). Neither replaces query-first table design for structured lookups. Both paths are covered in [module 06](../06-data-api-and-vector-search/data-api-and-vector-search.md).
+
 ## Modelling checklist
 
 Before you ship a table:
 
 - [ ] Every hot path is written as a query with **known** partition key values
-- [ ] No partition grows forever
-- [ ] Dual-write tables are named (`users_by_id` / `users_by_email`) so the application cannot “forget” the second write
-- [ ] TTL is set where data should die (sessions, inbox)
+- [ ] No hot path uses `ALLOW FILTERING`
+- [ ] No partition grows forever (bucketing in place where needed)
+- [ ] Dual-write tables are named (`users_by_id` / `users_by_email`) so the application cannot "forget" the second write
+- [ ] TTL is set where data should die (sessions, inbox); no mass row `DELETE` where TTL or a partition delete would do
+- [ ] SAI is used only as a **secondary** filter after a partition key hit — never as the primary lookup
 - [ ] You are not depending on compaction settings or `gc_grace_seconds`
 
-Knowledge Search is a **collection**, not a CQL primary key. It is taught in [module 06](../06-data-api-and-vector-search/data-api-and-vector-search.md).
-
 ## Lab — Enterprise Identity (CQL console)
+
+**Goal:** Translate the four access patterns from the identity use case into CQL tables, write and read data through each one, and observe directly why `ALLOW FILTERING` and secondary indexes are not the right tools for a hot path.
+
+By the end you will have:
+- Four query-first tables, each with a key that matches exactly one access pattern
+- A dual-write in action (`users_by_id` + `users_by_email` written together)
+- An SAI index used correctly as a *secondary* filter
+- A live demonstration of the `ALLOW FILTERING` anti-pattern
 
 Open your Serverless (vector) database → **CQL console**. Select your keyspace (often `default_keyspace`).
 
@@ -170,6 +176,8 @@ USE default_keyspace;
 If your keyspace name differs, use that name everywhere below. If the console rejects a paste of several statements, run them one `CREATE TABLE` at a time.
 
 ### A1. Create query-first tables
+
+> Each table is named after its access pattern. The partition key is the value the caller **always knows** when making that query.
 
 ```sql
 CREATE TABLE IF NOT EXISTS users_by_id (
@@ -207,7 +215,18 @@ DESCRIBE TABLE users_by_id;
 
 Expected: each `CREATE TABLE` succeeds (or reports the table already exists). `DESCRIBE` shows `PRIMARY KEY (user_id)` and **no** clustering column. That is correct for Q1 (get profile by id).
 
+Notice how each table encodes one access pattern:
+
+| Table | Partition key | Access pattern |
+|---|---|---|
+| `users_by_id` | `user_id` | Q1 — get profile |
+| `entitlements_by_user` | `user_id` (clustering: `entitlement`) | Q2 — list entitlements |
+| `sessions_by_id` | `session_id` + TTL | Q3 — get session |
+| `users_by_email` | `email` | Q4 — login by email |
+
 ### A2. Write and read one user
+
+> The two `INSERT`s at the top are the **dual-write contract**: every profile change must land in both `users_by_id` and `users_by_email`. If one is skipped, the email lookup returns stale or missing data. The application — not Astra — owns this consistency.
 
 ```sql
 INSERT INTO users_by_id (user_id, email, display_name, status, updated_at)
@@ -226,7 +245,7 @@ INSERT INTO sessions_by_id (session_id, user_id, created_at, last_seen)
 VALUES (22222222-2222-2222-2222-222222222222, 11111111-1111-1111-1111-111111111111, toTimestamp(now()), toTimestamp(now()));
 ```
 
-Queries — each is a **single partition**:
+Queries — each is a **single partition hit**:
 
 ```sql
 SELECT * FROM users_by_id WHERE user_id = 11111111-1111-1111-1111-111111111111;
@@ -240,7 +259,23 @@ SELECT * FROM sessions_by_id WHERE session_id = 22222222-2222-2222-2222-22222222
 
 Expected: inserts report no rows. The four `SELECT`s return **one** profile (Alex), **one** email mapping, **two** entitlements (`invoice.read` and `invoice.write`), and **one** session.
 
-### A3. Feel the anti-pattern (do not ship this)
+### A3. SAI as a secondary filter (valid use)
+
+Add an SAI index on `status` inside `users_by_id`. The partition key (`user_id`) is still required — SAI narrows the result **within** a partition, it does not replace the partition key.
+
+```sql
+CREATE INDEX IF NOT EXISTS ON users_by_id (status) USING 'StorageAttachedIndex';
+```
+
+Now query with both the partition key **and** the SAI filter:
+
+```sql
+SELECT * FROM users_by_id WHERE user_id = 11111111-1111-1111-1111-111111111111 AND status = 'active';
+```
+
+Expected: Alex's row. The query lands on one partition first (`user_id`), then SAI filters by `status`. This is the correct pattern — SAI as a secondary filter, not a primary lookup.
+
+### A4. Feel the anti-pattern (do not ship this)
 
 ```sql
 SELECT * FROM users_by_id WHERE email = 'alex@example.com';
@@ -256,9 +291,12 @@ Now try:
 SELECT * FROM users_by_id WHERE email = 'alex@example.com' ALLOW FILTERING;
 ```
 
-Expected: Alex’s row on this tiny table. `ALLOW FILTERING` lets CQL scan and match a **non-key** column (here `email`). That scan hits every partition you read; it will not stay fast as the table grows. It is **not** a production path. The production path is `users_by_email`.
+Expected: Alex's row on this tiny table. `ALLOW FILTERING` lets CQL scan and match a **non-key** column (here `email`). That scan hits every partition in the table; it will not stay fast as the table grows. It is **not** a production path. The production path is `users_by_email` — a partition hit, not a scan.
 
-**Deliverable:** You can explain why identity is four tables, not one.
+**Deliverables:**
+- You can explain why identity is four tables, not one
+- You can describe the dual-write contract and who owns it
+- You can explain when SAI is valid (secondary filter) and when it is not (primary lookup replacing a table)
 
 ## Next
 
