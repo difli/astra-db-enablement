@@ -264,7 +264,7 @@ Expected: inserts report no rows. The four `SELECT`s return **one** profile (Ale
 Add an SAI index on `status` inside `users_by_id`. The partition key (`user_id`) is still required — SAI narrows the result **within** a partition, it does not replace the partition key.
 
 ```sql
-CREATE INDEX IF NOT EXISTS ON users_by_id (status) USING 'StorageAttachedIndex';
+CREATE CUSTOM INDEX IF NOT EXISTS ON users_by_id (status) USING 'StorageAttachedIndex';
 ```
 
 Now query with both the partition key **and** the SAI filter:
