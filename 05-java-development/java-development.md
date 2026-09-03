@@ -124,9 +124,13 @@ Source: [Java driver](https://docs.datastax.com/en/astra-db-serverless/drivers/j
 
 ## Lab — Connect, write, read (`users_by_id`)
 
-The code is above and in [`sample-app`](../sample-app/sample-app.md). You run it with Maven; you do not paste it into the CQL console.
+In this lab you run `IdentityApp` — the class shown in the **Tables through the Data API** section above. It connects to your Astra database, writes one user row to `users_by_id`, and reads it back. You run it with Maven from your terminal; you do not paste anything into the CQL console.
 
-Prerequisites: `users_by_id` from [module 03](../03-data-modeling/data-modeling.md); Java 17+ and Maven 3.9+; `.env` filled in [module 00](../00-get-started/get-started.md).
+Before you start, make sure:
+- The `users_by_id` table exists — you created it in [module 03](../03-data-modeling/data-modeling.md)
+- Java 17 or later is installed (`java -version`)
+- Maven 3.9+ is installed (`mvn -version`)
+- Your `.env` file has `API_ENDPOINT`, `APPLICATION_TOKEN`, and `KEYSPACE_NAME` filled in — see [module 00](../00-get-started/get-started.md)
 
 Java reads **process environment variables** in **this** terminal, not the `.env` file. Load them first (you can `cd` into `sample-app` afterwards; the variables stay in the terminal).
 
