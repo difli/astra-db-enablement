@@ -28,7 +28,7 @@ You cannot create a keyspace with CQL on Astra DB. Keyspaces are created in the 
 
 ## Copy connection details
 
-In the repository root, copy `.env.example` to `.env` and fill in `API_ENDPOINT`, `APPLICATION_TOKEN`, and `KEYSPACE_NAME`. `.env` is gitignored. Saving the file is not enough: Java does not read `.env`. Before you run Maven, load the variables in that same terminal (commands in **Set environment variables for Lab 2** below).
+In the repository root, copy `.env.example` to `.env` and fill in `API_ENDPOINT`, `APPLICATION_TOKEN`, and `KEYSPACE_NAME`. `.env` is gitignored. Do not commit tokens. You load these variables in the Java lab ([module 05](../05-java-development/java-development.md)); Java does not read `.env` by itself.
 
 From the database page, copy:
 
@@ -47,38 +47,6 @@ You do **not** need a Secure Connect Bundle for this workshop. The SCB is for th
 1. Open your database in the Astra Portal.
 2. Click **CQL console**.
 3. Wait for the `token@cqlsh>` prompt (this session uses your portal login, not the application token).
-
-If the prompt appears, you are ready for the CQL lab in [module 03](../03-data-modeling/data-modeling.md).
-
-## Set environment variables for Lab 2
-
-The Java apps read **process environment variables** in the **same terminal** where you run Maven. Pick one path. You can `cd` into `sample-app` afterwards; the variables stay in that terminal.
-
-**Quick path** (bash, zsh, or Git Bash on Windows), from the repository root after `.env` is filled:
-
-```bash
-set -a && source .env && set +a
-```
-
-**Explicit path** if you prefer not to `source .env`, or you are in Windows PowerShell.
-
-On macOS / Linux / Git Bash:
-
-```bash
-export API_ENDPOINT="https://DATABASE_ID-REGION.apps.astra.datastax.com"
-export APPLICATION_TOKEN="AstraCS:..."
-export KEYSPACE_NAME="default_keyspace"
-```
-
-On Windows PowerShell:
-
-```powershell
-$env:API_ENDPOINT="https://DATABASE_ID-REGION.apps.astra.datastax.com"
-$env:APPLICATION_TOKEN="AstraCS:..."
-$env:KEYSPACE_NAME="default_keyspace"
-```
-
-Do not commit tokens to git.
 
 ## Free-plan note
 

@@ -123,7 +123,33 @@ Source: [Java driver](https://docs.datastax.com/en/astra-db-serverless/drivers/j
 
 The code is above and in [`sample-app`](../sample-app/sample-app.md). You run it with Maven; you do not paste it into the CQL console.
 
-Prerequisites: `users_by_id` from [module 03](../03-data-modeling/data-modeling.md); Java 17+ and Maven 3.9+; environment variables from [00 Get started](../00-get-started/get-started.md) in **this** terminal (quick `source .env`, or the explicit `export` / PowerShell commands).
+Prerequisites: `users_by_id` from [module 03](../03-data-modeling/data-modeling.md); Java 17+ and Maven 3.9+; `.env` filled in [module 00](../00-get-started/get-started.md).
+
+Java reads **process environment variables** in **this** terminal, not the `.env` file. Load them first (you can `cd` into `sample-app` afterwards; the variables stay in the terminal).
+
+**Quick path** (bash, zsh, or Git Bash on Windows), from the repository root:
+
+```bash
+set -a && source .env && set +a
+```
+
+**Explicit path** if you prefer not to `source .env`, or you are in Windows PowerShell.
+
+On macOS / Linux / Git Bash:
+
+```bash
+export API_ENDPOINT="https://DATABASE_ID-REGION.apps.astra.datastax.com"
+export APPLICATION_TOKEN="AstraCS:..."
+export KEYSPACE_NAME="default_keyspace"
+```
+
+On Windows PowerShell:
+
+```powershell
+$env:API_ENDPOINT="https://DATABASE_ID-REGION.apps.astra.datastax.com"
+$env:APPLICATION_TOKEN="AstraCS:..."
+$env:KEYSPACE_NAME="default_keyspace"
+```
 
 `test -f pom.xml || cd sample-app` means: if you are not already in the folder that contains `pom.xml`, enter `sample-app`.
 
@@ -145,7 +171,7 @@ If it fails:
 
 | Symptom | Check |
 |---|---|
-| `API_ENDPOINT` / `APPLICATION_TOKEN` must be defined | Load vars in **this** terminal (module 00: `source .env` or explicit `export` / PowerShell). Java does not read `.env` |
+| `API_ENDPOINT` / `APPLICATION_TOKEN` must be defined | Load vars in **this** terminal (`source .env` or explicit `export` / PowerShell). Java does not read `.env` |
 | 401 / unauthorized | Token copied fully, `AstraCS:` prefix, no extra quotes or spaces |
 | table not found | Module 03 identity tables; keyspace name; CQL names are case-sensitive if created in the portal |
 | `findOne` empty | Same keyspace as module 03; `user_id` matches the uuid you inserted |

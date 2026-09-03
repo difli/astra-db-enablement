@@ -13,7 +13,7 @@ One Maven project. Data API only (`astra-db-java`). No Spring Boot.
 
 ## Run
 
-Java 17+ and Maven 3.9+. The apps read **process environment variables**. Load them in this terminal first (quick `set -a && source .env && set +a` from the repository root, or the explicit commands in [00 Get started](../00-get-started/get-started.md)), then:
+Java 17+ and Maven 3.9+. The apps read **process environment variables**. Load them in this terminal first (commands in [module 05](../05-java-development/java-development.md)), then:
 
 ```bash
 test -f pom.xml || cd sample-app
