@@ -2,7 +2,7 @@
 
 Take-home. Not a workshop module. Not on the two-hour clock.
 
-Use after [the decision tree](01-why-astra-db/why-astra-db.md) and [reference architectures](reference-architectures/reference-architectures.md). Numeric quotas live on [database limits](https://docs.datastax.com/en/astra-db-serverless/databases/database-limits.html).
+Use after the [Astra DB Workload Assessment](ASTRA-DB-WORKLOAD-ASSESSMENT.md), [reference architectures](reference-architectures/reference-architectures.md), and [data modelling](03-data-modeling/data-modeling.md). Fit tree: [Why Astra DB](01-why-astra-db/why-astra-db.md). If the source is Oracle, complete the [Oracle to Astra DB assessment](ORACLE-TO-ASTRA-ASSESSMENT.md) before this checklist. Numeric quotas live on [database limits](https://docs.datastax.com/en/astra-db-serverless/databases/database-limits.html).
 
 ## Fit
 

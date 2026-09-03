@@ -153,7 +153,7 @@ You can now answer:
 | Which constraints matter? | Unsupported `WITH` is a **warning**. `CREATE KEYSPACE` is an **error**. Vector PCU is **one unit**. Numbers: [database limits](https://docs.datastax.com/en/astra-db-serverless/databases/database-limits.html). |
 | Common mistakes? | `ALLOW FILTERING` as the email lookup. Compaction in DDL. Extra regions as vector-query HA. |
 
-Take-home (not on the clock): [reference architectures](../reference-architectures/reference-architectures.md), the [architecture review checklist](../ARCHITECTURE-REVIEW-CHECKLIST.md), and the [Oracle to Astra DB assessment](../ORACLE-TO-ASTRA-ASSESSMENT.md).
+Take-home (not on the clock): [Astra DB Workload Assessment](../ASTRA-DB-WORKLOAD-ASSESSMENT.md), [Oracle to Astra DB assessment](../ORACLE-TO-ASTRA-ASSESSMENT.md) if the source is Oracle, [reference architectures](../reference-architectures/reference-architectures.md), [data modelling](../03-data-modeling/data-modeling.md), and the [architecture review checklist](../ARCHITECTURE-REVIEW-CHECKLIST.md).
 
 ## Optional next reading
 

@@ -29,40 +29,61 @@ Source: [About Astra DB Serverless](https://docs.datastax.com/en/astra-db-server
 
 ```mermaid
 flowchart TD
-  start["Should I use Astra DB?"] --> work{"What is the workload?"}
+  start["Could Astra DB fit this application?"]
 
-  work -->|Analytics / reporting / ad-hoc SQL| warehouse["Warehouse or relational store"]
+  start --> workload{"What is the primary workload?"}
 
-  work -->|Operational application data| ops{"Can you name the hot access patterns?"}
-  ops -->|Not yet| design["Define access patterns first"]
-  ops -->|Yes| tables["Astra tables"]
-  tables --> id["Identity platforms"]
-  tables --> profiles["Customer profiles"]
-  tables --> sessions["Session stores"]
-  tables --> ingest["Event ingestion"]
-  tables --> inbox["Event inbox"]
-  tables --> ts["Time-series workloads"]
+  workload -->|"Operational serving"| access
+  workload -->|"Semantic, vector, or hybrid retrieval"| access
+  workload -->|"Operational + semantic retrieval"| access
 
-  work -->|Knowledge Search / AI| vec["Astra vector search"]
-  vec --> ks["Knowledge Search"]
-  vec --> semantic["Semantic Search"]
-  vec --> docs["Document Search"]
+  workload -->|"Broad analytics, BI, ad-hoc SQL, joins"| analytical["Analytical platform, warehouse, or relational system is likely the primary fit"]
 
-  work -->|Operational plus AI| both["Serverless (vector): tables and collections in one database"]
-  both --> tables
-  both --> vec
+  workload -->|"Not yet known"| discovery["Define user journeys, critical queries, scale, latency, availability, and retention requirements"]
+
+  discovery --> access
+
+  access{"Are the critical read and write access patterns known?"}
+
+  access -->|"No"| design["Define and validate the important access patterns first"]
+
+  access -->|"Yes"| relational
+
+  relational{"Does the workload depend on arbitrary joins, broad ad-hoc queries, foreign-key constraints, or multi-entity transactions?"}
+
+  relational -->|"Yes"| relationalfit["Keep those capabilities in a relational platform or split out the operational subset"]
+
+  relational -->|"No"| validation
+
+  design --> validation
+
+  validation{"Can the workload be shown to meet its requirements for scale, latency, availability, consistency, retention, and cost?"}
+
+  validation -->|"Yes"| fit["Good Astra DB candidate"]
+
+  validation -->|"Partially"| polyglot["Astra DB may fit part of the solution"]
+
+  validation -->|"No"| other["Consider another primary platform"]
+
+  fit --> examples["Representative patterns: identity and access state, customer profiles, sessions, entitlements, device state, event ingestion, event inboxes with validated partitioning, retention, and lifecycle design, time-series workloads, RAG, semantic search, recommendations, and hybrid search"]
 ```
 
-Use Astra DB when you want Cassandra’s access pattern — **known partition, predictable latency, high write throughput** — without operating a cluster.
+The goal of this assessment is not to choose a schema, API, or application architecture. The goal is to determine whether Astra DB is a strong platform candidate for the workload. Decisions such as tables versus collections, partition keys, indexing, vector search, and application integration come later.
+
+The examples after **Good Astra DB candidate** are representative patterns, not automatic approvals. Walk the questions for that workload.
+
+Use Astra DB when you need scalable operational data serving, predictable low-latency access patterns, high availability, or semantic retrieval capabilities without operating Cassandra infrastructure.
 
 | Strong fit | Consider another technology |
 |---|---|
 | Known keys: identity, profiles, sessions, inbox, ingest, time-series | Ad-hoc SQL, warehouses |
 | Knowledge Search, semantic search, document search | |
 
-A few joins are not a reason to reject Astra. Implement them in the data model and application (extra query tables, denormalization, dual-write). Join-centric systems and ad-hoc SQL as the product belong on a relational store or warehouse.
+A few joins are not a reason to reject Astra DB. Implement them in the data model and application (extra query tables, denormalization, dual-write). Join-centric systems and ad-hoc SQL as the product belong on a relational store or warehouse.
 
-For design review (access patterns, partitions, consistency, table properties, vector search, capacity), use the [architecture review checklist](../ARCHITECTURE-REVIEW-CHECKLIST.md).
+Need a deeper workload assessment? Use the [Astra DB Workload Assessment](../ASTRA-DB-WORKLOAD-ASSESSMENT.md). It helps architects evaluate applications, identify access patterns, classify workloads, and determine whether Astra DB deserves further investigation before data modelling begins.
+
+After you have a design, use the [architecture review checklist](../ARCHITECTURE-REVIEW-CHECKLIST.md).
 
 ## How is Astra DB different from self-managed Cassandra?
 
@@ -108,7 +129,7 @@ Source: [Shared responsibility model](https://docs.datastax.com/en/astra-db-serv
 
 ## Check your understanding
 
-You can walk the decision tree out loud and name which workshop pattern sits on the “yes” branch: Identity, Event Inbox, or Knowledge Search.
+Walk the assessment tree out loud for Identity, Event Inbox, or Knowledge Search. Say why a representative pattern is still not an automatic approval.
 
 ## Next
 

@@ -10,7 +10,9 @@ The question is not “should we replace Oracle?” The question is:
 
 **How do I identify Oracle workloads that are good Astra DB candidates?**
 
-After this document: [decision tree](01-why-astra-db/why-astra-db.md) → [reference architectures](reference-architectures/reference-architectures.md) → [architecture review checklist](ARCHITECTURE-REVIEW-CHECKLIST.md).
+If you are evaluating a workload independent of a source platform, start with the [Astra DB Workload Assessment](ASTRA-DB-WORKLOAD-ASSESSMENT.md). Use this document when the workload already runs on Oracle and migration questions must be addressed.
+
+After this Oracle-specific document: [Why Astra DB](01-why-astra-db/why-astra-db.md) → [reference architectures](reference-architectures/reference-architectures.md) → [data modelling](03-data-modeling/data-modeling.md) → [architecture review checklist](ARCHITECTURE-REVIEW-CHECKLIST.md).
 
 ---
 

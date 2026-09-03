@@ -43,7 +43,7 @@ About **two hours**. Module pages do not carry a stopwatch. Numeric quotas are n
 
 ## Use cases
 
-Three customer-neutral patterns. Sketches: [reference architectures](reference-architectures/reference-architectures.md). Review questions: [architecture review checklist](ARCHITECTURE-REVIEW-CHECKLIST.md).
+Three customer-neutral patterns. Qualify a named application with the [Astra DB Workload Assessment](ASTRA-DB-WORKLOAD-ASSESSMENT.md). Sketches: [reference architectures](reference-architectures/reference-architectures.md). Review questions: [architecture review checklist](ARCHITECTURE-REVIEW-CHECKLIST.md).
 
 | Pattern | Used to teach |
 |---|---|
@@ -75,4 +75,12 @@ Astra DB Serverless documentation wins whenever it conflicts with Cassandra folk
 1. Complete [00 Get started](00-get-started/get-started.md)
 2. Work through modules 01–06 in order (labs run on those pages)
 
-When you finish, walk the [decision tree](01-why-astra-db/why-astra-db.md) (questions 2–5). For later: [reference architectures](reference-architectures/reference-architectures.md), the [architecture review checklist](ARCHITECTURE-REVIEW-CHECKLIST.md), and the [Oracle to Astra DB assessment](ORACLE-TO-ASTRA-ASSESSMENT.md).
+When you finish, walk the [decision tree](01-why-astra-db/why-astra-db.md) (questions 2–5).
+
+For later (architecture path):
+
+1. [Astra DB Workload Assessment](ASTRA-DB-WORKLOAD-ASSESSMENT.md) — generic workload qualification
+2. [Oracle to Astra DB assessment](ORACLE-TO-ASTRA-ASSESSMENT.md) — if the source is Oracle
+3. [Reference architectures](reference-architectures/reference-architectures.md)
+4. [03 Data modelling](03-data-modeling/data-modeling.md)
+5. [Architecture review checklist](ARCHITECTURE-REVIEW-CHECKLIST.md)

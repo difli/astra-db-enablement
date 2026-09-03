@@ -1,6 +1,6 @@
 # Reference architectures
 
-Take-home one-pager. Not a timed workshop module. Use it after [the decision tree](../01-why-astra-db/why-astra-db.md). After a design review, use the [architecture review checklist](../ARCHITECTURE-REVIEW-CHECKLIST.md).
+Take-home one-pager. Not a timed workshop module. Use after [Why Astra DB](../01-why-astra-db/why-astra-db.md) and the [Astra DB Workload Assessment](../ASTRA-DB-WORKLOAD-ASSESSMENT.md). If the source is Oracle, complete the [Oracle to Astra DB assessment](../ORACLE-TO-ASTRA-ASSESSMENT.md) first. Modelling is [module 03](../03-data-modeling/data-modeling.md). After a design review, use the [architecture review checklist](../ARCHITECTURE-REVIEW-CHECKLIST.md).
 
 Three customer-neutral patterns. No extra labs.
 
