@@ -43,7 +43,7 @@ This workshop uses **tables for identity and inbox**, and a **collection for Kno
 
 Each Astra DB Serverless database starts in **one primary region**. Inside that region, data is replicated across availability zones. Replication factor and strategy are **platform-controlled** — you cannot set them in CQL.
 
-Writes are **eventually consistent** across replicas (and across regions, if you add regions). The Data API always uses **`LOCAL_QUORUM`**. CQL reads support all consistency levels. CQL writes support all consistency levels except `ONE`, `ANY`, and `LOCAL_ONE`.
+Within a single region, the Data API always uses **`LOCAL_QUORUM`** — writes are acknowledged by a quorum of replicas before returning. Across **multiple regions** (if you add them), replication is asynchronous and eventually consistent. CQL reads support all consistency levels. CQL writes support all consistency levels except `ONE`, `ANY`, and `LOCAL_ONE`.
 
 Adding regions is a paid capability. Extra regions **replicate data**. Plan vector **query** capacity as single-region today — each vector PCU group is one unit (module 04).
 

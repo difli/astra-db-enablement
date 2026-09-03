@@ -77,9 +77,9 @@ knowledge.find(filter, options);
 
 You can also put vectors on **tables**. Collections are the faster teaching surface for document-shaped search.
 
-## Platform constraints
+## Platform constraints (reminder)
 
-From [module 04](../04-astra-specific-behavior/astra-specific-behavior.md) and [plan PCU groups](https://docs.datastax.com/en/astra-db-serverless/administration/plan-pcu.html):
+These are covered in [module 04](../04-astra-specific-behavior/astra-specific-behavior.md) — repeated here because they directly affect Knowledge Search design. Full details and current numbers: [plan PCU groups](https://docs.datastax.com/en/astra-db-serverless/administration/plan-pcu.html).
 
 - Vector PCU groups are **one unit** (no autoscaling, no burst).
 - Plan Knowledge Search **query** capacity as single-region today. Extra regions can replicate data; each vector region is still one PCU.
@@ -108,8 +108,8 @@ ANN neighbours for topic=identity:
 ```
 
 What you are seeing:
-- Four documents (`k1`–`k4`) were inserted — two tagged `topic=identity`, two tagged with other topics.
-- The metadata filter `topic=identity` drops the non-identity documents before ANN runs.
+- Four documents were inserted: `k1` and `k2` tagged `topic=identity` (password reset, employee directory), `k3` tagged `topic=finance` (invoice webhooks), `k4` tagged `topic=platform` (vector search regions).
+- The metadata filter `topic=identity` drops `k3` and `k4` before ANN runs.
 - `limit(3)` is the maximum; two results is correct because only two documents match the filter.
 - `k1` comes first because its embedding is the closest to the query vector.
 

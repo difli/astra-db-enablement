@@ -72,7 +72,7 @@ From [Plan PCU groups](https://docs.datastax.com/en/astra-db-serverless/administ
 
 1. Shipping Cassandra DDL with compaction / `gc_grace_seconds` and believing it applied
 2. Ignoring [database limits](https://docs.datastax.com/en/astra-db-serverless/databases/database-limits.html) until a create/index/rate call fails
-3. Using `ALLOW FILTERING` or a secondary index as the identity lookup
+3. Using `ALLOW FILTERING` or SAI as the primary identity lookup (instead of `users_by_email`)
 4. Assuming vector search is multi-region HA like a CQL table
 5. Calling `CREATE KEYSPACE` from a migration script
 

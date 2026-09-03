@@ -264,8 +264,10 @@ Expected: inserts report no rows. The four `SELECT`s return **one** profile (Ale
 Add an SAI index on `status` inside `users_by_id`. SAI is a cluster-wide index — it can technically work without a partition key, but that turns every query into a full cluster scan. The correct pattern is to always supply the partition key **first**, then use SAI as an additional filter on the result.
 
 ```sql
-CREATE CUSTOM INDEX IF NOT EXISTS ON users_by_id (status) USING 'StorageAttachedIndex';
+CREATE CUSTOM INDEX ON users_by_id (status) USING 'StorageAttachedIndex';
 ```
+
+If you re-run this lab, the index already exists and the statement will error. Drop it first with `DROP INDEX users_by_id_status_idx;` then recreate.
 
 Now query with both the partition key **and** the SAI filter:
 
