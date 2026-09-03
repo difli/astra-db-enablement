@@ -18,12 +18,12 @@ At its core, vector search is a four-step workflow:
 3. **Search for similar vectors** — Astra finds the stored vectors closest to the query vector.
 4. **Filter optionally** — narrow the candidate set with a metadata filter (for example `topic = "identity"`) before or alongside the vector sort.
 
-Astra DB uses **approximate nearest neighbour (ANN)**, not exact KNN. ANN may miss the mathematically perfect neighbour. That is expected and is a deliberate performance trade-off.
+Vector search at scale uses **approximate nearest neighbour (ANN)** — this is true of all vector databases, not just Astra. ANN trades a small chance of missing the mathematically perfect neighbour for the speed needed to search millions of vectors in milliseconds. The results are highly relevant in practice.
 
 ## What vector search is not
 
 - **Not a replacement for `WHERE user_id = ?`** — structured identity and inbox lookups stay on CQL tables with a partition key.
-- **Not exact match** — ANN returns the closest results, not a guaranteed exact hit.
+- **Not keyword or exact-value lookup** — ANN finds the most *similar* results, not documents that contain a specific word or match a specific value. Use CQL `WHERE` for exact lookups; use vector search for similarity.
 - **Not multi-region vector-query HA** — extra regions replicate documents but do not add vector-query capacity; each region has a one-PCU ceiling (see [module 04](../04-astra-specific-behavior/astra-specific-behavior.md)).
 - **Not model-agnostic** — vectors are not human-readable; the embedding model is baked into the numbers. You must use the **same model** for insert and query or results are meaningless.
 
