@@ -1,7 +1,5 @@
 # Sources
 
-Every technical claim in this workshop is grounded in Astra DB Serverless documentation. When Cassandra training material and Astra documentation conflict, Astra documentation wins.
-
 ## Product and getting started
 
 | Topic | Page |
@@ -49,6 +47,6 @@ Every technical claim in this workshop is grounded in Astra DB Serverless docume
 |---|---|
 | Find data with vector search | [Vector search](https://docs.datastax.com/en/astra-db-serverless/databases/vector-search.html) |
 
-## Modelling pedagogy adapted from
+## Data modelling
 
-Query-first design, partition keys, clustering, denormalisation, bucketing, wide/hot partitions, TTL, tombstones, and anti-patterns are adapted from [michelderu/cassandra-fundamentals](https://github.com/michelderu/cassandra-fundamentals) (data-modelling track only). Architecture, gossip, repairs, and Docker cluster labs are not used.
+Query-first design in this workshop follows the data-modelling track of [michelderu/cassandra-fundamentals](https://github.com/michelderu/cassandra-fundamentals).

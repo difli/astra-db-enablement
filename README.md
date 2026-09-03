@@ -75,4 +75,4 @@ Astra DB Serverless documentation wins whenever it conflicts with Cassandra folk
 1. Complete [00 Get started](00-get-started/get-started.md)
 2. Work through modules 01–06 in order (labs run on those pages)
 
-The [decision tree](01-why-astra-db/why-astra-db.md) is how you answer 2–5 in the room. Take-home (not on the clock): [reference architectures](reference-architectures/reference-architectures.md), the [architecture review checklist](ARCHITECTURE-REVIEW-CHECKLIST.md), and the [Oracle to Astra DB assessment](ORACLE-TO-ASTRA-ASSESSMENT.md) (modernization opportunity discovery).
+When you finish, walk the [decision tree](01-why-astra-db/why-astra-db.md) (questions 2–5). For later: [reference architectures](reference-architectures/reference-architectures.md), the [architecture review checklist](ARCHITECTURE-REVIEW-CHECKLIST.md), and the [Oracle to Astra DB assessment](ORACLE-TO-ASTRA-ASSESSMENT.md).
