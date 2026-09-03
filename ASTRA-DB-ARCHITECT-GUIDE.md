@@ -46,41 +46,28 @@ A successful Astra DB workload usually has well-understood access patterns, clea
 
 Write down what the application is for before listing queries.
 
-- What does the application do?
-- Who uses it?
-- What are the critical user journeys?
-- Which operations are latency-sensitive?
-- Which operations occur most frequently?
-- What business capability depends on the application?
-- What retention and deletion requirements exist?
-- Which requirements are operational, reporting-oriented, search-oriented, or analytical?
-
-- [ ] The application’s purpose is stated in one paragraph
-- [ ] Primary users and channels are named
-- [ ] The three to five journeys that matter most are listed
-- [ ] Latency-sensitive operations are marked
-- [ ] High-frequency operations are marked
-- [ ] The failure impact of this application is explicit
-- [ ] Retention and deletion expectations are known
-- [ ] Operational serving, reporting, and search are distinguished (they may need different stores)
+- [ ] Purpose in one paragraph; users and channels named
+- [ ] Three to five critical journeys listed
+- [ ] Latency-sensitive and high-frequency operations marked
+- [ ] Failure impact explicit
+- [ ] Retention and deletion expectations known
+- [ ] Operational serving, reporting, search, and analytics distinguished (they may need different stores)
 
 If journeys and frequency are unknown, the outcome is **further assessment required**. Stop here and collect that information.
 
 ### 2.2 Access-pattern discovery
 
-Astra DB evaluates applications by **access patterns**: the production reads and writes, with the values the caller already has.
+Astra DB evaluates applications by **access patterns**: production reads and writes, and the values known at request time.
 
-A pattern is usable when the team can say, for each hot path: what is requested, what is known at request time, how often it runs, and what “good” looks like (latency, freshness, durability, retention).
+For each hot path, name what is requested, what the caller already knows, how often it runs, and what “good” looks like.
 
-- [ ] The top reads can be listed
-- [ ] The top writes can be listed
-- [ ] Identifiers for those paths are known at request time
-- [ ] Frequency of each hot path is known
-- [ ] Latency-sensitive paths are understood
-- [ ] Success criteria can be defined (latency, throughput, availability, retention, cost)
-- [ ] Reporting can be separated from operational serving
+- [ ] Top reads and writes listed
+- [ ] Identifiers known at request time
+- [ ] Frequency and latency-sensitive paths understood
+- [ ] Success criteria defined (latency, throughput, availability, retention, cost)
+- [ ] Reporting separated from operational serving
 
-If the team cannot list the hot reads and writes, the outcome is **further assessment required**. Qualify the workload before [data modelling](03-data-modeling/data-modeling.md).
+If the hot reads and writes cannot be listed, stop: **further assessment required**. Qualify before [data modelling](03-data-modeling/data-modeling.md).
 
 | Journey | Typical known values | Pattern shape |
 |---|---|---|
@@ -94,30 +81,26 @@ These examples do not approve a platform choice.
 
 ### 2.3 Workload classification
 
-Use this after discovery, not instead of it. **Workload category alone is never sufficient.** Typical fit means “worth investigating,” not “approved.”
+Use this after discovery, not instead of it. **Workload category alone is never approval.** Typical fit means “worth investigating.”
 
 | Workload | Typical fit | Comments |
 |---|---|---|
 | Identity and access | Strong candidate | Lookups by known principal or session |
-| Customer profiles | Strong candidate | Get and update by customer id |
-| Customer 360 / Subscriber 360 | Candidate with questions | Operational lookup and profile access often fit. Cross-domain reporting, analytics, and relationship discovery often require additional platforms. |
+| Customer profiles | Strong candidate | Direct get/update by customer id |
+| Customer 360 / Subscriber 360 | Candidate with questions | Operational profile access may fit; cross-domain reporting and relationship discovery may require additional platforms |
 | Session management | Strong candidate | Known session id; finite lifetime |
 | Entitlements | Strong candidate | Current grants for a known principal |
 | Device inventory | Strong candidate | Get by device id |
-| Product catalogs | Candidate with questions | Get-by-key is operational; browse, facet, and merchandising may be mixed |
-| Configuration data | Candidate with questions | Often small; justify Astra DB with scale, availability, or access-pattern needs |
+| Product catalogs | Candidate with questions | Get-by-key is operational; browse and merchandising may be mixed |
+| Configuration data | Candidate with questions | Often small; justify with scale, availability, or access patterns |
 | Event ingestion | Strong candidate | High write volume on known stream keys |
 | Event history | Candidate with questions | Read windows and retention must be bounded |
-| Event inbox | Candidate with questions | Needs a bounded working set plus validated retention and lifecycle design |
-| Telemetry | Candidate with questions | Ingest often fits; unbounded history and dashboard SQL often do not |
-| Knowledge search | Strong candidate | Similarity plus metadata filters |
-| Semantic retrieval | Strong candidate | Retrieve by meaning, usually with a scope filter |
-| RAG | Strong candidate | The retrieval slice; generation stays in the application |
+| Event inbox | Candidate with questions | Requires a bounded working set and validated lifecycle |
+| Telemetry | Candidate with questions | Ingestion may fit; dashboard SQL and unbounded history may not |
+| Knowledge search / semantic retrieval / RAG | Strong candidate | Similarity-based retrieval. RAG uses this retrieval layer; generation remains in the application |
 | Recommendations | Candidate with questions | Serving known features can fit; training and ad-hoc analysis usually do not |
-| Operational + semantic retrieval | Strong candidate | Operational lookup and semantic retrieval coexist. Evaluate each access path independently. |
-| Analytics | Another platform likely preferred | Scans, aggregations, and changing questions |
-| Warehousing | Another platform likely preferred | Historical SQL is the product |
-| Ad-hoc reporting | Another platform likely preferred | The query is not known in advance |
+| Operational + semantic retrieval | Strong candidate | Each access path should be assessed independently |
+| Analytics / warehousing / ad-hoc reporting | Another platform likely preferred | Scans, historical SQL, or queries not known in advance |
 | Join-centric applications | Another platform likely preferred | Arbitrary joins and multi-entity transactions on the hot path |
 
 ### 2.4 Positive signals and disqualifiers
@@ -149,15 +132,15 @@ A long list of signals with unknown queries is still **further assessment requir
 
 ### 2.5 Assessment outcome
 
-Collect before modelling: journeys, top reads and writes, identifiers known at request time, and measurable success criteria (scale, latency, availability, consistency, retention, cost).
+Meanings are in [section 1](#1-how-to-use-this-guide). Before modelling, you need journeys, top reads and writes, known identifiers, and measurable success criteria.
 
-| Result | Meaning | Immediate action |
-|---|---|---|
-| **Strong candidate** | Access patterns are known, constraints do not block, and the workload can be shown to meet its requirements. | Continue with a representative pattern in [section 3](#3-representative-architectures). |
-| **Candidate with questions** | The category often fits, but lifecycle, mixed reporting, or application change still needs evidence. | Resolve open discovery questions. Do not start modelling until those questions have owners. |
-| **Split workload** | Some paths are operational; others are reporting, joins, or analytics. | Split operational and analytical paths. Score the operational subset again. Leave reporting and join-centric paths on the store that already serves them. |
-| **Further assessment required** | Journeys, queries, identifiers, or success criteria are missing. | Return to [discovery](#21-workload-discovery) and [access patterns](#22-access-pattern-discovery). A missing query list is not a platform decision. |
-| **Another platform preferred** | The primary value is analytics, ad-hoc SQL, arbitrary joins, or wide multi-entity transactions. | Stop assessment for that path. Do not start data modelling for it. |
+| Result | Immediate action |
+|---|---|
+| **Strong candidate** | Continue with a representative pattern in [section 3](#3-representative-architectures). |
+| **Candidate with questions** | Resolve open discovery questions before modelling. |
+| **Split workload** | Score the operational subset again. Leave reporting and join-centric paths on the store that already serves them. |
+| **Further assessment required** | Return to [discovery](#21-workload-discovery) and [access patterns](#22-access-pattern-discovery). A missing query list is not a platform decision. |
+| **Another platform preferred** | Stop for that path. Do not start data modelling for it. |
 
 ---
 
