@@ -24,6 +24,19 @@ Requirements: **Java 17+** (21 recommended), Maven 3.9+.
 
 Source: [Get started with the Data API](https://docs.datastax.com/en/astra-db-serverless/api-reference/dataapiclient.html).
 
+## What the sample app demonstrates
+
+The sections below walk through the key Data API patterns in code. Read them first — the lab at the end of this page asks you to run the app and point to these lines.
+
+The project in [`sample-app/sample-app.md`](../sample-app/sample-app.md) is the only Java application in this repository.
+
+| Class | Shows |
+|---|---|
+| [`Connect`](../sample-app/src/main/java/com/datastax/enablement/Connect.java) | Client + database from endpoint, token, and keyspace |
+| [`IdentityApp`](../sample-app/src/main/java/com/datastax/enablement/IdentityApp.java) | Table insert and find by partition key (Enterprise Identity) |
+| [`KnowledgeSearchApp`](../sample-app/src/main/java/com/datastax/enablement/KnowledgeSearchApp.java) | Collection insert and ANN search with a metadata filter |
+| [`WorkshopApp`](../sample-app/src/main/java/com/datastax/enablement/WorkshopApp.java) | Runs identity then Knowledge Search |
+
 ## Authenticate
 
 From [`Connect.java`](../sample-app/src/main/java/com/datastax/enablement/Connect.java):
@@ -41,17 +54,6 @@ Database database = client.getDatabase(endpoint, keyspace);
 No contact points, no SCB unzip, no `cassandra.yaml`. Pass the keyspace so this lab hits the same container as the CQL tables from module 03.
 
 Never hard-code tokens. Never commit `.env` files.
-
-## What the sample app demonstrates
-
-The project in [`sample-app/sample-app.md`](../sample-app/sample-app.md) is the only Java application in this repository.
-
-| Class | Shows |
-|---|---|
-| [`Connect`](../sample-app/src/main/java/com/datastax/enablement/Connect.java) | Client + database from endpoint, token, and keyspace |
-| [`IdentityApp`](../sample-app/src/main/java/com/datastax/enablement/IdentityApp.java) | Table insert and find by partition key (Enterprise Identity) |
-| [`KnowledgeSearchApp`](../sample-app/src/main/java/com/datastax/enablement/KnowledgeSearchApp.java) | Collection insert and ANN search with a metadata filter |
-| [`WorkshopApp`](../sample-app/src/main/java/com/datastax/enablement/WorkshopApp.java) | Runs identity then Knowledge Search |
 
 ## Tables through the Data API
 
@@ -113,10 +115,12 @@ Source: [Java driver](https://docs.datastax.com/en/astra-db-serverless/drivers/j
 
 ## Application habits that matter on Astra
 
-- **Timeouts and retries with backoff** on rate limits (especially after hibernation or a traffic jump)
-- **Idempotent writes** (inbox primary key) rather than LWT on a hot partition
-- **Dual-write `users_by_email`** when a profile changes (the lab below writes `users_by_id` only)
-- **Warm** on-demand databases before a launch, or use PCUs in production
+- **Timeouts and retries with backoff** on rate limits (especially after hibernation or a traffic spike)
+- **Idempotent writes** — include a meaningful ID in the primary key so a retry is the same row, not a duplicate; avoid LWT on a hot partition
+- **Dual-write lookup tables** — when a profile changes, write both `users_by_id` and `users_by_email`; the application owns that consistency (the lab writes `users_by_id` only)
+- **Catch the already-exists exception on `createCollection`** — collections fail if the name exists; catch and call `getCollection` instead (see `KnowledgeSearchApp`)
+- **Never hard-code tokens** — read from environment variables; never commit `.env` or credentials to source control
+- **Warm on-demand databases before a launch** — open the database in the portal until status shows **Active**, or use PCUs in production to avoid cold-start latency
 
 ## Lab — Connect, write, read (`users_by_id`)
 
