@@ -53,7 +53,7 @@ Source: [Database limits](https://docs.datastax.com/en/astra-db-serverless/datab
 
 | Path | Auth | This workshop |
 |---|---|---|
-| **Astra Portal** | Login | Explore data, CQL console |
+| **Astra Portal** | Login | Data Explorer, CQL console |
 | **Data API + clients** | API endpoint + application token | **Lab 2**, Java `astra-db-java` |
 | **CQL console** | Portal session | **Lab 1** |
 | **Cassandra drivers** | Secure Connect Bundle + token as password | Mentioned, not built |
@@ -75,13 +75,6 @@ DESCRIBE KEYSPACES;
 ```
 
 You should see your keyspace. You will **not** see a Cassandra ring or `nodetool status`. That is the point.
-
-## Common mistakes already
-
-- Creating a **non-vector** database, then wondering why Lab 2 collections/vector fail
-- Putting the token in git
-- Assuming `CREATE KEYSPACE` in CQL will work
-- Treating collections as “the new tables” for identity lookups — use a table when the query is a primary key
 
 ## Next
 
