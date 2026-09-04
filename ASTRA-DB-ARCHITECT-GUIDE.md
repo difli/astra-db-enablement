@@ -200,7 +200,7 @@ PRIMARY KEY ((consumer_id, bucket), event_time, event_id)
 
 **API:** CQL or Data API tables. High ingest, idempotent primary key.
 
-**Avoid:** one partition per consumer forever; tuning `compaction` / `gc_grace_seconds` (Astra [ignores](https://docs.datastax.com/en/astra-db-serverless/cql/develop-with-cql.html) them); `ALLOW FILTERING` on payload as the hot path.
+**Avoid:** one partition per consumer forever; tuning `compaction` / `gc_grace_seconds` — Astra [ignores](https://docs.datastax.com/en/astra-db-serverless/cql/develop-with-cql.html) them silently (the DDL succeeds and the table is created, but the setting is discarded); `ALLOW FILTERING` on payload as the hot path.
 
 This pattern is not an automatic fit. Validate partitioning, retention, ordering, deduplication, backlog (the intended read window), and lifecycle for the real workload.
 
@@ -237,11 +237,13 @@ Use this after qualification, a representative shape, and [data modelling](03-da
 
 - [ ] Every hot path is a known access pattern, not ad-hoc SQL or joins
 - [ ] Each hot query can hit **one partition** (or a small, bounded set)
-- [ ] You do not need to set RF, compaction, `cassandra.yaml`, UDFs, or materialized views
-- [ ] You do not need write consistency `ONE`, `ANY`, or `LOCAL_ONE`
+- [ ] RF and compaction strategy cannot be set; `cassandra.yaml`, UDFs, and materialized views are not available on Astra
+- [ ] CQL write consistency `ONE`, `ANY`, and `LOCAL_ONE` are not supported; use `LOCAL_QUORUM` or higher
 - [ ] Vector search, if any, is **ANN + metadata**, not exact KNN
 
 ### 4.2 Data model and lifecycle
+
+> **Delete mechanics matter here.** In Astra DB (Cassandra), a `DELETE` is a **write** — it creates a tombstone marker in the SSTable that persists until compaction. A mass row-delete job generates one tombstone per row and can accumulate faster than compaction removes them. `TTL`, by contrast, does not write a tombstone at insert time; it writes the live cell with an expiry timestamp. After expiry the client stops seeing the data; the cell is cleaned up by compaction. Use TTL for natural expiry (sessions, inbox retention). Use a partition delete to intentionally drop an old time bucket. Avoid mass row deletes as a recurring operational pattern.
 
 - [ ] No partition grows forever; hotspot risk is named and mitigated
 - [ ] Retention is explicit (TTL and/or bounded windows)
@@ -256,7 +258,8 @@ Use this after qualification, a representative shape, and [data modelling](03-da
 - [ ] One table per query (`users_by_id`, `users_by_email`, `entitlements_by_user`, `sessions_by_id`)
 - [ ] Application **dual-writes** `users_by_id` and `users_by_email`
 - [ ] Sessions use table TTL; they are not unbounded
-- [ ] Email lookup is not `ALLOW FILTERING` or a secondary index as the hot path
+- [ ] Email lookup is not `ALLOW FILTERING` or an SAI index as the primary lookup path — it is a separate `users_by_email` table
+- [ ] SAI is appropriate as a secondary predicate filter within a known partition (e.g. filtering `status` inside `user_id`); it is not a substitute for a query-first table
 - [ ] Identity is **tables**, not a collection
 
 ### 4.4 Event Inbox
